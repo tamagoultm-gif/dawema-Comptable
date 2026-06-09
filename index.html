@@ -518,6 +518,73 @@
       .pedit input:focus {
         border-color: var(--gold);
       }
+      .ai-out {
+        margin-top: 12px;
+      }
+      .ai-text {
+        background: rgba(232, 196, 104, 0.06);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: var(--cream);
+        font-size: 13.5px;
+        line-height: 1.75;
+      }
+      .ai-text b {
+        color: var(--gold);
+      }
+      .searchbox {
+        width: 100%;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-family: "Manrope";
+        font-size: 14px;
+        outline: none;
+        margin: 0 0 10px;
+      }
+      .searchbox:focus {
+        border-color: var(--gold);
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .hd-actions,
+        .tabs,
+        .noprint,
+        .del,
+        .delall,
+        .fpill,
+        .fbar,
+        .filebtn,
+        .primary {
+          display: none !important;
+        }
+        .panel {
+          border: 1px solid #ccc;
+          box-shadow: none;
+          break-inside: avoid;
+        }
+        .hero,
+        .kcard,
+        .scard,
+        .mini,
+        .li-title,
+        .kc-val,
+        .sc-val,
+        .pl,
+        .hero-val,
+        .ai-text {
+          color: #000 !important;
+        }
+        .login {
+          display: none !important;
+        }
+      }
       .statussel {
         font-size: 11px;
         font-weight: 700;
@@ -725,6 +792,20 @@
       var fbAuth = firebase.auth();
       var db = firebase.firestore();
       var dataRef = db.collection("dawema").doc("data");
+
+      /* ====== CLÉ IA (OpenRouter — GRATUITE, marche en Tunisie) ======
+   👉 Mets ta clé gratuite ici (openrouter.ai → Keys → Create Key) */
+      var OPENROUTER_KEY =
+        "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";
+      var AI_MODELS = [
+        "deepseek/deepseek-chat-v3-0324:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "google/gemini-2.0-flash-exp:free",
+        "qwen/qwen-2.5-72b-instruct:free",
+        "mistralai/mistral-small-3.1-24b-instruct:free",
+      ];
+      /* =============================================================== */
+      /* ================================================ */
     </script>
 
     <script>
@@ -768,6 +849,25 @@
       }
       var tab = "home";
       var orderFilter = "all";
+      var period = "all";
+      var orderSearch = "";
+      function inPeriod(dstr) {
+        if (period === "all" || !dstr) return true;
+        var t = new Date(dstr);
+        if (isNaN(t.getTime())) return true;
+        var now = new Date();
+        if (period === "month")
+          return (
+            t.getFullYear() === now.getFullYear() &&
+            t.getMonth() === now.getMonth()
+          );
+        var days = period === "7" ? 7 : 30;
+        return t.getTime() >= now.getTime() - days * 86400000;
+      }
+      function setPeriod(p) {
+        period = p;
+        render();
+      }
 
       /* ---------- utils ---------- */
       function num(v) {
@@ -802,13 +902,13 @@
       /* ---------- KPIs ---------- */
       function kpis() {
         var d = orders.filter(function (o) {
-          return o.status === "delivered";
+          return o.status === "delivered" && inPeriod(o.date);
         });
         var r = orders.filter(function (o) {
-          return o.status === "returned";
+          return o.status === "returned" && inPeriod(o.date);
         });
         var p = orders.filter(function (o) {
-          return o.status === "pending";
+          return o.status === "pending" && inPeriod(o.date);
         });
         var revenue = d.reduce(function (s, o) {
           return s + num(o.sell);
@@ -825,14 +925,14 @@
           }, 0);
         var ads = expenses
           .filter(function (e) {
-            return e.type === "ads";
+            return e.type === "ads" && inPeriod(e.date);
           })
           .reduce(function (s, e) {
             return s + num(e.amount);
           }, 0);
         var other = expenses
           .filter(function (e) {
-            return e.type !== "ads";
+            return e.type !== "ads" && inPeriod(e.date);
           })
           .reduce(function (s, e) {
             return s + num(e.amount);
@@ -855,7 +955,7 @@
           nD: d.length,
           nR: r.length,
           nP: p.length,
-          nT: orders.length,
+          nT: d.length + r.length + p.length,
         };
       }
       function daily() {
@@ -891,6 +991,8 @@
         ["orders", "Commandes"],
         ["expenses", "Dépenses"],
         ["products", "Produits"],
+        ["analyse", "📊 Analyse"],
+        ["rapports", "📈 Rapports"],
       ];
       function renderTabs() {
         document.getElementById("tabs").innerHTML = TABS.map(function (t) {
@@ -917,6 +1019,8 @@
         else if (tab === "orders") v.innerHTML = viewOrders();
         else if (tab === "expenses") v.innerHTML = viewExpenses();
         else if (tab === "products") v.innerHTML = viewProducts();
+        else if (tab === "analyse") v.innerHTML = viewAnalyse();
+        else if (tab === "rapports") v.innerHTML = viewRapports();
       }
 
       function viewHome() {
@@ -959,6 +1063,26 @@
               '<div class="legend"><span><i class="dot" style="background:var(--green)"></i>Entrées</span><span><i class="dot" style="background:var(--red)"></i>Sorties</span></div>';
         return (
           "" +
+          '<div class="fbar">' +
+          [
+            ["all", "Tout"],
+            ["month", "Ce mois"],
+            ["30", "30 jours"],
+            ["7", "7 jours"],
+          ]
+            .map(function (x) {
+              return (
+                '<button class="fpill ' +
+                (period === x[0] ? "on" : "") +
+                '" onclick="setPeriod(\'' +
+                x[0] +
+                "')\">" +
+                x[1] +
+                "</button>"
+              );
+            })
+            .join("") +
+          "</div>" +
           '<div class="hero"><div class="hero-l">' +
           '<span class="hero-lbl">Profit net</span>' +
           '<span class="hero-val ' +
@@ -1081,6 +1205,10 @@
             "Note / client (optionnel)",
             '<input id="o_note" placeholder="Nom du client, numéro…">'
           ) +
+          f(
+            "Ville (optionnel)",
+            '<input id="o_city" placeholder="ex: Tunis, Sfax…">'
+          ) +
           '<button class="primary" onclick="addOrder()">+ Enregistrer la commande</button></div>';
 
         var cAll = orders.length,
@@ -1175,13 +1303,29 @@
                   );
                 })
                 .join("");
+        var search =
+          '<input id="o_search" class="searchbox" placeholder="🔎 Rechercher (nom, produit, ville…)" oninput="filterOrders(this.value)" value="' +
+          esc(orderSearch) +
+          '">';
         var list =
           '<div class="panel">' +
           fbar +
-          '<div class="list" style="padding:0">' +
+          search +
+          '<div class="list" id="orders_list" style="padding:0">' +
           rows +
           "</div></div>";
         return importCard() + form + list;
+      }
+      function filterOrders(q) {
+        orderSearch = q;
+        var ql = (q || "").toLowerCase();
+        var box = document.getElementById("orders_list");
+        if (!box) return;
+        var items = box.getElementsByClassName("li");
+        for (var i = 0; i < items.length; i++) {
+          var t = (items[i].textContent || "").toLowerCase();
+          items[i].style.display = !ql || t.indexOf(ql) > -1 ? "" : "none";
+        }
       }
       function setFilter(fl) {
         orderFilter = fl;
@@ -1225,6 +1369,7 @@
           returnFee: (document.getElementById("o_ret") || {}).value || "",
           date: document.getElementById("o_date").value || today(),
           note: document.getElementById("o_note").value,
+          city: (document.getElementById("o_city") || {}).value || "",
           product: document.getElementById("o_prodname").value,
         });
         save("orders", orders);
@@ -1569,6 +1714,14 @@
             ]),
             prod: findCol(H, ["product", "produit", "article", "item"]),
             qty: findCol(H, ["quantity", "quantité", "qte", "qty"]),
+            city: findCol(H, [
+              "city",
+              "ville",
+              "gouvernorat",
+              "region",
+              "région",
+              "délégation",
+            ]),
           };
           if (ci.sell < 0) {
             alert(
@@ -1605,6 +1758,7 @@
               status: mapStatus(ci.status > -1 ? r[ci.status] : ""),
               date: parseDate(ci.date > -1 ? r[ci.date] : ""),
               qty: qty,
+              city: ci.city > -1 ? (r[ci.city] || "").trim() : "",
               note: nm || (prodStr ? prodStr.slice(0, 40) : "Commande " + ref),
               product: prodStr,
             };
@@ -1616,6 +1770,7 @@
               o.status = data.status;
               o.date = data.date;
               o.qty = data.qty;
+              o.city = data.city;
               o.product = data.product;
               if (nm) o.note = nm;
               updated++;
@@ -1650,6 +1805,694 @@
         };
         rdr.readAsText(file, "UTF-8");
         ev.target.value = "";
+      }
+
+      /* ===================== ANALYSE ===================== */
+      function prodKey(o) {
+        var p = splitProducts(o.product || "");
+        return (p[0] || o.product || "Sans produit").trim() || "Sans produit";
+      }
+      function viewAnalyse() {
+        var delivered = orders.filter(function (o) {
+          return o.status === "delivered";
+        });
+        var returned = orders.filter(function (o) {
+          return o.status === "returned";
+        });
+        if (orders.length === 0) {
+          return '<div class="panel"><p class="empty">Pas encore de données. Importe ton CSV ou ajoute des commandes, puis reviens ici.</p></div>';
+        }
+
+        /* ---- par produit ---- */
+        var P = {};
+        delivered.forEach(function (o) {
+          var k = prodKey(o);
+          P[k] = P[k] || { name: k, rev: 0, profit: 0, n: 0, ret: 0 };
+          P[k].rev += num(o.sell);
+          P[k].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+          P[k].n++;
+        });
+        returned.forEach(function (o) {
+          var k = prodKey(o);
+          P[k] = P[k] || { name: k, rev: 0, profit: 0, n: 0, ret: 0 };
+          P[k].ret++;
+        });
+        var plist = Object.keys(P)
+          .map(function (k) {
+            return P[k];
+          })
+          .sort(function (a, b) {
+            return b.profit - a.profit;
+          });
+
+        var prodRows =
+          plist.length === 0
+            ? '<p class="empty">Aucune vente livrée pour le moment.</p>'
+            : plist
+                .map(function (p) {
+                  var tot = p.n + p.ret,
+                    tr = tot > 0 ? Math.round((p.ret / tot) * 100) : 0;
+                  var col =
+                    p.profit > 0
+                      ? "var(--green)"
+                      : p.profit < 0
+                      ? "var(--red)"
+                      : "var(--muted)";
+                  return (
+                    '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                    esc(p.name) +
+                    "</span>" +
+                    '<span class="badge" style="color:var(--teal);background:var(--teal)22">' +
+                    p.n +
+                    " vendus</span>" +
+                    (tr >= 30
+                      ? '<span class="badge" style="color:var(--red);background:var(--red)22">retours ' +
+                        tr +
+                        "%</span>"
+                      : "") +
+                    "</div>" +
+                    '<div class="li-sub">Chiffre: ' +
+                    fmt(p.rev) +
+                    "</div></div>" +
+                    '<div class="li-right"><span class="pl" style="color:' +
+                    col +
+                    '">' +
+                    fmt(p.profit) +
+                    "</span></div></div>"
+                  );
+                })
+                .join("");
+
+        /* ---- par ville ---- */
+        var V = {};
+        delivered.forEach(function (o) {
+          var c = (o.city || "").trim() || "Inconnue";
+          V[c] = V[c] || { name: c, rev: 0, profit: 0, n: 0 };
+          V[c].rev += num(o.sell);
+          V[c].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+          V[c].n++;
+        });
+        var vlist = Object.keys(V)
+          .map(function (k) {
+            return V[k];
+          })
+          .sort(function (a, b) {
+            return b.rev - a.rev;
+          });
+        var hasCity = vlist.some(function (v) {
+          return v.name !== "Inconnue";
+        });
+        var villeRows = !hasCity
+          ? '<p class="hint" style="margin:0">Pas de villes enregistrées. Réimporte ton CSV (la colonne "City" sera lue automatiquement) pour voir où vont tes ventes.</p>'
+          : vlist
+              .slice(0, 12)
+              .map(function (v) {
+                return (
+                  '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                  esc(v.name) +
+                  "</span>" +
+                  '<span class="badge" style="color:var(--gold);background:var(--gold)22">' +
+                  v.n +
+                  " cmd</span></div>" +
+                  '<div class="li-sub">Profit: ' +
+                  fmt(v.profit) +
+                  "</div></div>" +
+                  '<div class="li-right"><span class="pl">' +
+                  fmt(v.rev) +
+                  "</span></div></div>"
+                );
+              })
+              .join("");
+
+        /* ---- conseils pub (ROAS) ---- */
+        var rev = delivered.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = delivered.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var delc = delivered.reduce(function (s, o) {
+          return s + num(o.delivery);
+        }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var grossMargin = rev - cogs - delc; // avant pub
+        var marginRatio = rev > 0 ? grossMargin / rev : 0;
+        var roas = ads > 0 ? rev / ads : 0;
+        var breakeven = marginRatio > 0 ? 1 / marginRatio : 0;
+        var adsTxt = "";
+        if (ads <= 0) {
+          adsTxt =
+            "Tu n'as pas encore enregistré de dépenses publicitaires. Ajoute-les dans l'onglet Dépenses pour calculer ton ROAS.";
+        } else if (marginRatio <= 0) {
+          adsTxt =
+            "⚠️ Ta marge avant pub est négative : tu perds de l'argent même sans compter la pub. Revois tes prix d'achat / de vente avant de dépenser en pub.";
+        } else {
+          var status =
+            roas >= breakeven * 1.3
+              ? "🟢 Très rentable"
+              : roas >= breakeven
+              ? "🟡 Rentable, juste"
+              : "🔴 En perte sur la pub";
+          adsTxt =
+            "Ton ROAS actuel est <b>" +
+            roas.toFixed(2) +
+            "x</b>. Ton seuil de rentabilité (break-even) est <b>" +
+            breakeven.toFixed(2) +
+            "x</b>. (" +
+            status +
+            ")<br>";
+          if (roas >= breakeven * 1.3)
+            adsTxt +=
+              "👉 Tu gagnes bien sur chaque dinar de pub. Tu peux <b>augmenter le budget</b> progressivement (+20% à la fois) en surveillant le ROAS.";
+          else if (roas >= breakeven)
+            adsTxt +=
+              "👉 Tu es rentable mais la marge est mince. <b>Optimise</b> (meilleures audiences/créatives) avant d'augmenter le budget.";
+          else
+            adsTxt +=
+              "👉 Tu perds de l'argent sur la pub. <b>Baisse le budget</b>, coupe les pubs faibles, ou augmente la marge (prix/coût) avant de continuer.";
+        }
+
+        /* ---- alertes ---- */
+        var alerts = [];
+        var noCost = products.filter(function (p) {
+          return !num(p.buy);
+        });
+        if (noCost.length)
+          alerts.push(
+            "🛒 " +
+              noCost.length +
+              " produit(s) sans prix d'achat — renseigne-les dans Produits puis clique « Recalculer les coûts » pour un profit exact."
+          );
+        plist.forEach(function (p) {
+          if (p.profit < 0)
+            alerts.push(
+              "📉 « " +
+                p.name +
+                " » te fait perdre de l'argent (" +
+                fmt(p.profit) +
+                "). Revois son prix ou son coût."
+            );
+        });
+        plist.forEach(function (p) {
+          var tot = p.n + p.ret;
+          if (tot >= 5 && p.ret / tot >= 0.3)
+            alerts.push(
+              "↩️ « " +
+                p.name +
+                " » a un taux de retour élevé (" +
+                Math.round((p.ret / tot) * 100) +
+                "%). Vérifie la qualité de confirmation/livraison."
+            );
+        });
+        var totDR = delivered.length + returned.length;
+        if (totDR >= 10) {
+          var dr = Math.round((delivered.length / totDR) * 100);
+          if (dr < 60)
+            alerts.push(
+              "🚚 Ton taux de livraison global est bas (" +
+                dr +
+                "%). Beaucoup de commandes ne sont pas livrées — améliore la confirmation par téléphone."
+            );
+        }
+        /* meilleur jour */
+        var D = {};
+        delivered.forEach(function (o) {
+          var d = o.date || "";
+          if (d) {
+            D[d] = D[d] || 0;
+            D[d] += num(o.sell) - num(o.buy) - num(o.delivery);
+          }
+        });
+        var bestDay = null,
+          bestV = -1e9;
+        Object.keys(D).forEach(function (d) {
+          if (D[d] > bestV) {
+            bestV = D[d];
+            bestDay = d;
+          }
+        });
+        var alertsTxt = alerts.length
+          ? alerts
+              .map(function (a) {
+                return (
+                  '<div class="li"><div class="li-main"><div class="li-sub" style="color:var(--cream);font-size:13px">' +
+                  a +
+                  "</div></div></div>"
+                );
+              })
+              .join("")
+          : '<p class="empty">Aucune alerte. Tout est sain 👍</p>';
+
+        return (
+          "" +
+          '<div class="panel"><h3>🤖 Analyse IA</h3><p class="hint" style="margin:-6px 0 10px">L\'IA lit tes chiffres et te donne des recommandations concrètes.</p>' +
+          '<button class="primary" onclick="runAI()">✨ Lancer l\'analyse IA</button> ' +
+          '<button class="primary" onclick="runAIProducts()" style="background:linear-gradient(135deg,var(--teal),#3aa593)">💡 Idées de nouveaux produits</button>' +
+          '<div id="ai_out" class="ai-out"></div></div>' +
+          '<div class="panel"><h3>🏆 Produits les plus rentables</h3><p class="hint" style="margin:-6px 0 10px">Classés du plus rentable au moins rentable.</p><div class="list" style="padding:0">' +
+          prodRows +
+          "</div></div>" +
+          '<div class="panel"><h3>📍 Ventes par ville</h3><div class="list" style="padding:0">' +
+          villeRows +
+          "</div></div>" +
+          '<div class="panel"><h3>📣 Conseils publicité</h3><p class="hint" style="margin:0;color:var(--cream);line-height:1.7">' +
+          adsTxt +
+          "</p></div>" +
+          (bestDay
+            ? '<div class="panel"><h3>📅 Meilleur jour</h3><p class="hint" style="margin:0;color:var(--cream)">Ton meilleur jour de profit : <b>' +
+              bestDay +
+              "</b> (" +
+              fmt(bestV) +
+              ").</p></div>"
+            : "") +
+          '<div class="panel"><h3>🔔 Alertes & recommandations</h3><div class="list" style="padding:0">' +
+          alertsTxt +
+          "</div></div>"
+        );
+      }
+
+      function aiSummary() {
+        var d = orders.filter(function (o) {
+          return o.status === "delivered";
+        });
+        var r = orders.filter(function (o) {
+          return o.status === "returned";
+        });
+        var p = orders.filter(function (o) {
+          return o.status === "pending";
+        });
+        var rev = d.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = d.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var delc = d.reduce(function (s, o) {
+          return s + num(o.delivery);
+        }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var other = expenses
+          .filter(function (e) {
+            return e.type !== "ads";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var profit = rev - cogs - delc - ads - other;
+        var roas = ads > 0 ? (rev / ads).toFixed(2) : "0";
+        var PR = {};
+        d.forEach(function (o) {
+          var k = prodKey(o);
+          PR[k] = PR[k] || { n: 0, profit: 0, ret: 0 };
+          PR[k].n++;
+          PR[k].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+        });
+        r.forEach(function (o) {
+          var k = prodKey(o);
+          PR[k] = PR[k] || { n: 0, profit: 0, ret: 0 };
+          PR[k].ret++;
+        });
+        var prods = Object.keys(PR)
+          .map(function (k) {
+            return {
+              name: k,
+              n: PR[k].n,
+              profit: Math.round(PR[k].profit),
+              ret: PR[k].ret,
+            };
+          })
+          .sort(function (a, b) {
+            return b.profit - a.profit;
+          })
+          .slice(0, 10);
+        var CI = {};
+        d.forEach(function (o) {
+          var c = (o.city || "").trim() || "Inconnue";
+          CI[c] = CI[c] || { n: 0, rev: 0 };
+          CI[c].n++;
+          CI[c].rev += num(o.sell);
+        });
+        var cities = Object.keys(CI)
+          .map(function (c) {
+            return { name: c, n: CI[c].n, rev: Math.round(CI[c].rev) };
+          })
+          .sort(function (a, b) {
+            return b.rev - a.rev;
+          })
+          .slice(0, 8);
+        var s =
+          "Devise: Dinar Tunisien (DT). Modèle: e-commerce paiement à la livraison (COD).\n";
+        s +=
+          "Commandes: livrées=" +
+          d.length +
+          ", retours=" +
+          r.length +
+          ", en attente=" +
+          p.length +
+          ".\n";
+        s +=
+          "Chiffre d'affaires (livré)=" +
+          Math.round(rev) +
+          " DT. Coût produits=" +
+          Math.round(cogs) +
+          ". Livraison=" +
+          Math.round(delc) +
+          ". Pub=" +
+          Math.round(ads) +
+          ". Autres=" +
+          Math.round(other) +
+          ".\n";
+        s += "Profit net=" + Math.round(profit) + " DT. ROAS=" + roas + "x.\n";
+        s +=
+          "Produits (nom | vendus | profit DT | retours): " +
+          prods
+            .map(function (x) {
+              return x.name + " | " + x.n + " | " + x.profit + " | " + x.ret;
+            })
+            .join(" ;; ") +
+          "\n";
+        s +=
+          "Villes (nom | commandes | CA DT): " +
+          (cities.length
+            ? cities
+                .map(function (x) {
+                  return x.name + " | " + x.n + " | " + x.rev;
+                })
+                .join(" ;; ")
+            : "non renseignées") +
+          "\n";
+        return s;
+      }
+      function runAI() {
+        var out = document.getElementById("ai_out");
+        if (!OPENROUTER_KEY || OPENROUTER_KEY === "COLLE_ICI") {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">⚠️ Ajoute ta clé OpenRouter gratuite dans le code (OPENROUTER_KEY). Voir openrouter.ai → Keys.</p>';
+          return;
+        }
+        if (orders.length === 0) {
+          out.innerHTML =
+            '<p class="hint">Pas encore de données à analyser.</p>';
+          return;
+        }
+        var prompt =
+          "Tu es un conseiller expert en e-commerce paiement à la livraison (COD) en Tunisie. " +
+          "Analyse les données chiffrées ci-dessous et donne des recommandations CONCRÈTES, courtes et actionnables, en français simple, organisées en sections avec des puces: " +
+          "1) Produits à pousser et produits à arrêter (avec pourquoi). 2) Conseils budget publicité (selon le ROAS). 3) Villes/régions à cibler. 4) Alertes importantes (retours, marges, livraison). " +
+          "Ne réinvente pas de chiffres, base-toi uniquement sur les données. Sois direct.\n\nDONNÉES:\n" +
+          aiSummary();
+        askAI(prompt, out);
+      }
+      function runAIProducts() {
+        var out = document.getElementById("ai_out");
+        if (!OPENROUTER_KEY || OPENROUTER_KEY === "COLLE_ICI") {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">⚠️ Ajoute ta clé OpenRouter dans le code (OPENROUTER_KEY).</p>';
+          return;
+        }
+        var prompt =
+          "Tu es un expert en produits gagnants pour l'e-commerce COD (paiement à la livraison) en Tunisie. " +
+          "En te basant sur les produits actuels de la boutique et leurs performances ci-dessous, propose 6 à 8 NOUVEAUX produits à tester. " +
+          "Pour chaque produit donne: le nom, pourquoi il peut marcher (tendance/besoin), prix d'achat estimé et prix de vente conseillé en DT, le public cible, et un angle pub simple. " +
+          "Privilégie des produits adaptés au marché tunisien et complémentaires à ce qui marche déjà. Réponds en français simple, en liste claire. " +
+          "IMPORTANT: ce sont des idées basées sur des connaissances générales (pas des données de marché en temps réel) — à tester avant d'investir.\n\nPRODUITS ACTUELS ET PERFORMANCES:\n" +
+          aiSummary();
+        askAI(prompt, out);
+      }
+      function askAI(prompt, out) {
+        out.innerHTML =
+          '<p class="hint">🤖 L\'IA réfléchit… (quelques secondes)</p>';
+        fetch("https://openrouter.ai/api/v1/models")
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var free = (d.data || [])
+              .filter(function (m) {
+                var p = m.pricing || {};
+                return (
+                  String(p.prompt) === "0" &&
+                  String(p.completion) === "0" &&
+                  (m.id || "").indexOf(":free") > -1
+                );
+              })
+              .map(function (m) {
+                return m.id;
+              });
+            var pref = [
+              "deepseek",
+              "llama-3.3",
+              "llama-3.1",
+              "gemini",
+              "qwen",
+              "gemma",
+              "mistral",
+              "phi",
+            ];
+            free.sort(function (a, b) {
+              function rk(x) {
+                for (var i = 0; i < pref.length; i++)
+                  if (x.indexOf(pref[i]) > -1) return i;
+                return 99;
+              }
+              return rk(a) - rk(b);
+            });
+            if (!free.length) free = AI_MODELS;
+            fetchAI(prompt, 0, out, "", free.slice(0, 10));
+          })
+          .catch(function () {
+            fetchAI(prompt, 0, out, "", AI_MODELS);
+          });
+      }
+      function fetchAI(prompt, i, out, lastErr, models) {
+        if (i >= models.length) {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">Aucun modèle gratuit ne répond pour le moment. ' +
+            esc(lastErr) +
+            "<br>Réessaie dans 1-2 minutes.</p>";
+          return;
+        }
+        fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + OPENROUTER_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: models[i],
+            messages: [{ role: "user", content: prompt }],
+          }),
+        })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            var txt = (((data.choices || [])[0] || {}).message || {}).content;
+            if (txt) {
+              out.innerHTML =
+                '<div class="ai-text">' +
+                esc(txt)
+                  .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+                  .replace(/^\s*[\*\-]\s/gm, "• ")
+                  .replace(/\n/g, "<br>") +
+                "</div>";
+              return;
+            }
+            var em = data.error
+              ? data.error.message || JSON.stringify(data.error)
+              : "erreur inconnue";
+            fetchAI(prompt, i + 1, out, em, models);
+          })
+          .catch(function (e) {
+            fetchAI(prompt, i + 1, out, e.message, models);
+          });
+      }
+
+      /* ===================== RAPPORTS ===================== */
+      var MONTHS_FR = [
+        "janv.",
+        "févr.",
+        "mars",
+        "avr.",
+        "mai",
+        "juin",
+        "juil.",
+        "août",
+        "sept.",
+        "oct.",
+        "nov.",
+        "déc.",
+      ];
+      function monthLabel(k) {
+        var p = k.split("-");
+        if (p.length < 2) return k;
+        var mi = parseInt(p[1], 10) - 1;
+        return (MONTHS_FR[mi] || p[1]) + " " + p[0];
+      }
+      function monthData() {
+        var m = {};
+        function get(k) {
+          m[k] = m[k] || {
+            key: k,
+            rev: 0,
+            cogs: 0,
+            deliv: 0,
+            exp: 0,
+            n: 0,
+            ret: 0,
+          };
+          return m[k];
+        }
+        orders.forEach(function (o) {
+          var k = (o.date || "").slice(0, 7);
+          if (!k) return;
+          if (o.status === "delivered") {
+            var x = get(k);
+            x.rev += num(o.sell);
+            x.cogs += num(o.buy);
+            x.deliv += num(o.delivery);
+            x.n++;
+          } else if (o.status === "returned") {
+            var y = get(k);
+            y.deliv += num(o.returnFee);
+            y.ret++;
+          }
+        });
+        expenses.forEach(function (e) {
+          var k = (e.date || "").slice(0, 7);
+          if (!k) return;
+          get(k).exp += num(e.amount);
+        });
+        return Object.keys(m)
+          .map(function (k) {
+            var x = m[k];
+            x.profit = x.rev - x.cogs - x.deliv - x.exp;
+            return x;
+          })
+          .sort(function (a, b) {
+            return b.key.localeCompare(a.key);
+          });
+      }
+      function viewRapports() {
+        var M = monthData();
+        if (M.length === 0)
+          return '<div class="panel"><p class="empty">Pas encore de données. Ajoute des commandes pour voir les rapports mensuels.</p></div>';
+        /* comparaison ce mois vs mois précédent */
+        var cur = M[0],
+          prev = M[1];
+        var cmp = "";
+        if (prev) {
+          var diff = cur.profit - prev.profit;
+          var pct =
+            prev.profit !== 0
+              ? Math.round((diff / Math.abs(prev.profit)) * 100)
+              : 0;
+          var col = diff >= 0 ? "var(--green)" : "var(--red)";
+          cmp =
+            '<div class="panel"><h3>📊 ' +
+            monthLabel(cur.key) +
+            " vs " +
+            monthLabel(prev.key) +
+            "</h3>" +
+            '<p class="hint" style="margin:0;color:var(--cream);line-height:1.8">Profit ce mois: <b style="color:' +
+            col +
+            '">' +
+            fmt(cur.profit) +
+            "</b> (" +
+            (diff >= 0 ? "+" : "") +
+            fmt(diff) +
+            ", " +
+            (pct >= 0 ? "+" : "") +
+            pct +
+            "%) vs " +
+            fmt(prev.profit) +
+            " le mois dernier.<br>" +
+            "Commandes livrées: " +
+            cur.n +
+            " vs " +
+            prev.n +
+            ".</p></div>";
+        }
+        /* graphe profit par mois (12 derniers) */
+        var chartM = M.slice(0, 12).slice().reverse();
+        var maxP = Math.max(
+          1,
+          Math.max.apply(
+            null,
+            chartM.map(function (x) {
+              return Math.abs(x.profit);
+            })
+          )
+        );
+        var chart =
+          '<div class="chart-wrap">' +
+          chartM
+            .map(function (x) {
+              var h = (Math.abs(x.profit) / maxP) * 100,
+                col = x.profit >= 0 ? "var(--green)" : "var(--red)";
+              return (
+                '<div class="bar-group"><div class="bars"><div class="bar" style="height:' +
+                h +
+                "%;background:" +
+                col +
+                '" title="' +
+                fmt(x.profit) +
+                '"></div></div><div class="bar-lbl">' +
+                x.key.slice(2) +
+                "</div></div>"
+              );
+            })
+            .join("") +
+          "</div>";
+        /* tableau mensuel */
+        var rows = M.map(function (x) {
+          var col = x.profit >= 0 ? "var(--green)" : "var(--red)";
+          return (
+            '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+            monthLabel(x.key) +
+            "</span>" +
+            '<span class="badge" style="color:var(--teal);background:var(--teal)22">' +
+            x.n +
+            " livrées</span></div>" +
+            '<div class="li-sub">CA ' +
+            fmt(x.rev) +
+            " · Achat " +
+            fmt(x.cogs) +
+            " · Livr. " +
+            fmt(x.deliv) +
+            " · Pub/autres " +
+            fmt(x.exp) +
+            "</div></div>" +
+            '<div class="li-right"><span class="pl" style="color:' +
+            col +
+            '">' +
+            fmt(x.profit) +
+            "</span></div></div>"
+          );
+        }).join("");
+        return (
+          "" +
+          '<div class="panel noprint"><button class="primary" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button></div>' +
+          cmp +
+          '<div class="panel"><h3>📈 Profit par mois</h3>' +
+          chart +
+          "</div>" +
+          '<div class="panel"><h3>🗓️ Détail mensuel</h3><div class="list" style="padding:0">' +
+          rows +
+          "</div></div>"
+        );
       }
 
       function f(label, inner) {
