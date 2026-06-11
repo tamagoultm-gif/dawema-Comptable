@@ -793,17 +793,9 @@
       var db = firebase.firestore();
       var dataRef = db.collection("dawema").doc("data");
 
-      /* ====== CLÉ IA (OpenRouter — GRATUITE, marche en Tunisie) ======
-   👉 Mets ta clé gratuite ici (openrouter.ai → Keys → Create Key) */
-      var OPENROUTER_KEY =
-        "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";
-      var AI_MODELS = [
-        "deepseek/deepseek-chat-v3-0324:free",
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "google/gemini-2.0-flash-exp:free",
-        "qwen/qwen-2.5-72b-instruct:free",
-        "mistralai/mistral-small-3.1-24b-instruct:free",
-      ];
+      /* ====== IA via Cloudflare Worker (AI de Cloudflare, gratuit) ======
+   Le Worker garde tout côté serveur. Aucune clé secrète ici. */
+      var AI_PROXY = "https://dawema-ai.tamagoultm.workers.dev";
       /* =============================================================== */
       /* ================================================ */
     </script>
@@ -2197,9 +2189,9 @@
       }
       function runAI() {
         var out = document.getElementById("ai_out");
-        if (!OPENROUTER_KEY || OPENROUTER_KEY === "COLLE_ICI") {
+        if (!AI_PROXY || AI_PROXY.indexOf("workers.dev") < 0) {
           out.innerHTML =
-            '<p class="hint" style="color:var(--red)">⚠️ Ajoute ta clé OpenRouter gratuite dans le code (OPENROUTER_KEY). Voir openrouter.ai → Keys.</p>';
+            '<p class="hint" style="color:var(--red)">⚠️ Lien du Worker IA manquant (AI_PROXY).</p>';
           return;
         }
         if (orders.length === 0) {
@@ -2217,9 +2209,9 @@
       }
       function runAIProducts() {
         var out = document.getElementById("ai_out");
-        if (!OPENROUTER_KEY || OPENROUTER_KEY === "COLLE_ICI") {
+        if (!AI_PROXY || AI_PROXY.indexOf("workers.dev") < 0) {
           out.innerHTML =
-            '<p class="hint" style="color:var(--red)">⚠️ Ajoute ta clé OpenRouter dans le code (OPENROUTER_KEY).</p>';
+            '<p class="hint" style="color:var(--red)">⚠️ Lien du Worker IA manquant (AI_PROXY).</p>';
           return;
         }
         var prompt =
@@ -2234,64 +2226,10 @@
       function askAI(prompt, out) {
         out.innerHTML =
           '<p class="hint">🤖 L\'IA réfléchit… (quelques secondes)</p>';
-        fetch("https://openrouter.ai/api/v1/models")
-          .then(function (r) {
-            return r.json();
-          })
-          .then(function (d) {
-            var free = (d.data || [])
-              .filter(function (m) {
-                var p = m.pricing || {};
-                return (
-                  String(p.prompt) === "0" &&
-                  String(p.completion) === "0" &&
-                  (m.id || "").indexOf(":free") > -1
-                );
-              })
-              .map(function (m) {
-                return m.id;
-              });
-            var pref = [
-              "deepseek",
-              "llama-3.3",
-              "llama-3.1",
-              "gemini",
-              "qwen",
-              "gemma",
-              "mistral",
-              "phi",
-            ];
-            free.sort(function (a, b) {
-              function rk(x) {
-                for (var i = 0; i < pref.length; i++)
-                  if (x.indexOf(pref[i]) > -1) return i;
-                return 99;
-              }
-              return rk(a) - rk(b);
-            });
-            if (!free.length) free = AI_MODELS;
-            fetchAI(prompt, 0, out, "", free.slice(0, 10));
-          })
-          .catch(function () {
-            fetchAI(prompt, 0, out, "", AI_MODELS);
-          });
-      }
-      function fetchAI(prompt, i, out, lastErr, models) {
-        if (i >= models.length) {
-          out.innerHTML =
-            '<p class="hint" style="color:var(--red)">Aucun modèle gratuit ne répond pour le moment. ' +
-            esc(lastErr) +
-            "<br>Réessaie dans 1-2 minutes.</p>";
-          return;
-        }
-        fetch("https://openrouter.ai/api/v1/chat/completions", {
+        fetch(AI_PROXY, {
           method: "POST",
-          headers: {
-            Authorization: "Bearer " + OPENROUTER_KEY,
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: models[i],
             messages: [{ role: "user", content: prompt }],
           }),
         })
@@ -2312,11 +2250,17 @@
             }
             var em = data.error
               ? data.error.message || JSON.stringify(data.error)
-              : "erreur inconnue";
-            fetchAI(prompt, i + 1, out, em, models);
+              : "réponse vide";
+            out.innerHTML =
+              '<p class="hint" style="color:var(--red)">L\'IA n\'a pas répondu. ' +
+              esc(em) +
+              "<br>Réessaie dans un instant.</p>";
           })
           .catch(function (e) {
-            fetchAI(prompt, i + 1, out, e.message, models);
+            out.innerHTML =
+              '<p class="hint" style="color:var(--red)">Erreur de connexion à l\'IA. Vérifie le lien du Worker.<br>' +
+              esc(e.message) +
+              "</p>";
           });
       }
 
