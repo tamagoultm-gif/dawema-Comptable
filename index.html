@@ -119,6 +119,13 @@ h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif}
 .ai-out{margin-top:12px}
 .ai-text{background:rgba(232,196,104,.06);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
   color:var(--cream);font-size:13.5px;line-height:1.75}
+.calc-rows{display:flex;flex-direction:column;gap:4px}
+.calc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.calc-ic{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.calc-lbl{flex:1;color:var(--cream);font-size:14px}
+.calc-val{font-size:16px;font-weight:700;white-space:nowrap}
+.calc-sep{border-top:2px solid var(--gold);margin:8px 0}
+.calc-total{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:16px;font-weight:700;color:var(--cream)}
 .ai-text b{color:var(--gold)}
 .searchbox{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--cream);
   padding:10px 12px;border-radius:10px;font-family:'Manrope';font-size:14px;outline:none;margin:0 0 10px}
@@ -309,37 +316,57 @@ function render(){
 }
 
 function viewHome(){
-  var k=kpis(), d=daily();
-  var maxV=Math.max(1,Math.max.apply(null,d.map(function(x){return Math.max(x.in,x.out)})));
-  var bars=d.length===0?'<p class="empty">Pas encore de données. Ajoute des commandes et dépenses pour voir le graphique.</p>'
-    :'<div class="chart-wrap">'+d.map(function(x){
-      return '<div class="bar-group"><div class="bars">'+
-        '<div class="bar in" style="height:'+(x.in/maxV*100)+'%" title="Entrées '+fmt(x.in)+'"></div>'+
-        '<div class="bar out" style="height:'+(x.out/maxV*100)+'%" title="Sorties '+fmt(x.out)+'"></div>'+
-        '</div><div class="bar-lbl">'+x.date.slice(5)+'</div></div>'}).join("")+'</div>'+
-      '<div class="legend"><span><i class="dot" style="background:var(--green)"></i>Entrées</span><span><i class="dot" style="background:var(--red)"></i>Sorties</span></div>';
-  return ''+
-  '<div class="fbar">'+[["all","Tout"],["month","Ce mois"],["30","30 jours"],["7","7 jours"]].map(function(x){
-    return '<button class="fpill '+(period===x[0]?"on":"")+'" onclick="setPeriod(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")+'</div>'+
-  '<div class="hero"><div class="hero-l">'+
-    '<span class="hero-lbl">Profit net</span>'+
-    '<span class="hero-val '+(k.profit>=0?"pos":"neg")+'">'+fmt(k.profit)+'</span>'+
-    '<span class="hero-meta">Marge '+k.margin.toFixed(1)+'% · Profit/commande '+fmt(k.profitPerOrder)+'</span>'+
-  '</div><div class="hero-r">'+
-    mini("Recettes",fmt(k.revenue),"var(--green)")+
-    mini("Total dépenses",fmt(k.out),"var(--red)")+
-    mini("ROAS (rendement pub)",k.roas?k.roas.toFixed(2)+"x":"—","var(--gold)")+
-  '</div></div>'+
-  '<div class="grid4">'+
-    card("📣","Dépenses pub",fmt(k.ads),"var(--gold)")+
-    card("📦","Coût d\'achat",fmt(k.cogs),"var(--teal)")+
-    card("🚚","Frais de livraison",fmt(k.deliv),"var(--teal)")+
-    card("👛","Autres dépenses",fmt(k.other),"var(--muted)")+
-  '</div>'+
-  '<div class="grid3">'+stat("Livrées",k.nD,"var(--green)")+stat("Retours",k.nR,"var(--red)")+stat("En attente",k.nP,"var(--gold)")+'</div>'+
-  '<div class="grid2">'+stat("Taux de livraison",k.deliveryRate.toFixed(0)+"%","var(--teal)")+stat("Total commandes",k.nT,"var(--cream)")+'</div>'+
-  '<div class="panel"><h3>Entrées vs sorties · 14 derniers jours</h3>'+bars+'</div>';
+  var k=kpis();
+  var fbar='<div class="fbar">'+[["all","Tout"],["month","Ce mois"],["30","30 jours"],["7","7 jours"]].map(function(x){
+    return '<button class="fpill '+(period===x[0]?"on":"")+'" onclick="setPeriod(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")+'</div>';
+
+  /* ---- bloc profit principal ---- */
+  var profitColor=k.profit>=0?"var(--green)":"var(--red)";
+  var profitIcon=k.profit>=0?"✅":"⚠️";
+  var hero='<div class="panel" style="text-align:center;padding:28px 20px">'+
+    '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Profit net '+periodLabel()+'</div>'+
+    '<div style="font-size:52px;font-weight:800;color:'+profitColor+';line-height:1.1">'+fmt(k.profit)+'</div>'+
+    '<div style="font-size:13px;color:var(--muted);margin-top:8px">'+profitIcon+' Marge '+k.margin.toFixed(1)+'% · '+fmt(k.profitPerOrder)+' / commande</div>'+
+  '</div>';
+
+  /* ---- calcul étape par étape ---- */
+  var calc='<div class="panel"><h3>🧮 Détail du calcul</h3>'+
+    '<div class="calc-rows">'+
+      calcRow("💰","Recettes (commandes livrées)",fmt(k.revenue),"var(--green)",false)+
+      calcRow("📣","− Dépenses publicité",fmt(k.ads),"var(--red)",true)+
+      calcRow("📦","− Coût d\'achat produits",fmt(k.cogs),"var(--red)",true)+
+      calcRow("🚚","− Frais de livraison",fmt(k.deliv),"var(--red)",true)+
+      calcRow("👛","− Autres dépenses",fmt(k.other),"var(--red)",true)+
+      '<div class="calc-sep"></div>'+
+      '<div class="calc-total"><span>= Profit net</span><span style="color:'+profitColor+';font-size:22px;font-weight:800">'+fmt(k.profit)+'</span></div>'+
+    '</div>'+
+    (k.roas>0?'<div style="margin-top:14px;padding:10px 14px;background:var(--gold)18;border-radius:10px;font-size:13px;color:var(--gold)">📊 ROAS : chaque 1 DT dépensé en pub a généré <b>'+k.roas.toFixed(2)+' DT</b> de recettes</div>':'')+
+  '</div>';
+
+  /* ---- commandes résumé ---- */
+  var nT=k.nD+k.nR+k.nP;
+  var pctD=nT>0?Math.round(k.nD/nT*100):0;
+  var pctR=nT>0?Math.round(k.nR/nT*100):0;
+  var cmds='<div class="panel"><h3>📦 Commandes</h3>'+
+    '<div class="grid3">'+
+      stat("✅ Livrées",k.nD,"var(--green)")+
+      stat("↩️ Retours",k.nR,"var(--red)")+
+      stat("⏳ En attente",k.nP,"var(--gold)")+
+    '</div>'+
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'+
+      badge("Taux de livraison",pctD+"%","var(--green)")+
+      badge("Taux de retour",pctR+"%","var(--red)")+
+      badge("Total",nT+" commandes","var(--muted)")+
+    '</div>'+
+  '</div>';
+
+  return fbar+hero+calc+cmds;
 }
+function periodLabel(){var L={"all":"(tout)","month":"(ce mois)","30":"(30j)","7":"(7j)"};return L[period]||""}
+function calcRow(ic,lbl,val,col,minus){
+  return '<div class="calc-row"><span class="calc-ic">'+ic+'</span><span class="calc-lbl">'+lbl+'</span><span class="calc-val" style="color:'+col+'">'+(minus&&val!=="0 DT"?'−':'')+val+'</span></div>'
+}
+function badge(lbl,val,col){return '<div style="background:'+col+'18;border-radius:8px;padding:6px 12px;font-size:13px"><span style="color:var(--muted)">'+lbl+' </span><b style="color:'+col+'">'+val+'</b></div>'}
 function mini(l,v,c){return '<div class="mini"><span class="mini-lbl">'+l+'</span><span class="mini-val" style="color:'+c+'">'+v+'</span></div>'}
 function card(ic,l,v,c){return '<div class="kcard"><div class="kc-ic" style="color:'+c+';background:'+c+'1f">'+ic+'</div><div><div class="kc-lbl">'+l+'</div><div class="kc-val">'+v+'</div></div></div>'}
 function stat(l,v,c){return '<div class="scard"><div class="sc-val" style="color:'+c+'">'+v+'</div><div class="sc-lbl">'+l+'</div></div>'}
