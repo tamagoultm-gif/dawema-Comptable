@@ -1,0 +1,3534 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dawema · Le Comptable</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;500;700&display=swap");
+      :root {
+        --ink: #0a1410;
+        --panel: #10201a;
+        --panel2: #15281f;
+        --line: #23392e;
+        --gold: #e8c468;
+        --green: #5fd39a;
+        --red: #f08c8c;
+        --teal: #4ecab0;
+        --cream: #f2ede1;
+        --muted: #90a89b;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        font-family: "Manrope", sans-serif;
+        color: var(--cream);
+        background: radial-gradient(
+            1200px 500px at 80% -10%,
+            rgba(232, 196, 104, 0.1),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 500px at 0% 110%,
+            rgba(78, 202, 176, 0.08),
+            transparent 55%
+          ),
+          var(--ink);
+        min-height: 100vh;
+        padding: 18px;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Bricolage Grotesque", sans-serif;
+      }
+
+      .hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 24px;
+        color: var(--ink);
+        background: linear-gradient(135deg, var(--gold), #caa23f);
+        box-shadow: 0 8px 24px rgba(232, 196, 104, 0.25);
+      }
+      .hd h1 {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .hd .sub {
+        color: var(--gold);
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .tag {
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-top: 2px;
+      }
+      .hd-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .login {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 50;
+        background: radial-gradient(
+            900px 500px at 50% 0%,
+            rgba(232, 196, 104, 0.1),
+            transparent 60%
+          ),
+          var(--ink);
+      }
+      .login-card {
+        background: linear-gradient(135deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 28px 24px;
+        width: 100%;
+        max-width: 340px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+      }
+      .login-title {
+        font-size: 20px;
+        font-weight: 800;
+      }
+      .login-sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .login-card .field {
+        text-align: left;
+      }
+      .login-err {
+        color: var(--red);
+        font-size: 12.5px;
+        min-height: 16px;
+        margin: -4px 0 0;
+      }
+      .ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-family: "Manrope";
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost:hover {
+        color: var(--cream);
+        border-color: var(--gold);
+      }
+      .ghost.danger:hover {
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 6px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+        overflow-x: auto;
+      }
+      .tab {
+        flex: 1;
+        min-width: fit-content;
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        padding: 10px 12px;
+        border-radius: 9px;
+        font-family: "Manrope";
+        font-weight: 700;
+        font-size: 13.5px;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+      .tab.on {
+        background: linear-gradient(135deg, var(--panel2), #1a2f24);
+        color: var(--cream);
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+      .tab:hover:not(.on) {
+        color: var(--cream);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .empty {
+        color: var(--muted);
+        text-align: center;
+        padding: 28px;
+        font-size: 14px;
+      }
+
+      .hero {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        background: linear-gradient(135deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 22px;
+        align-items: center;
+      }
+      .hero-l {
+        flex: 1;
+        min-width: 220px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .hero-lbl {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .hero-val {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 38px;
+        line-height: 1;
+        letter-spacing: -1px;
+      }
+      .pos {
+        color: var(--green);
+      }
+      .neg {
+        color: var(--red);
+      }
+      .hero-meta {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .hero-r {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .mini {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 14px;
+        min-width: 120px;
+      }
+      .mini-lbl {
+        display: block;
+        color: var(--muted);
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      .mini-val {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 18px;
+      }
+
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 640px) {
+        .grid4 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .kcard {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .kc-ic {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        font-size: 18px;
+      }
+      .kc-lbl {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .kc-val {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 17px;
+        margin-top: 2px;
+      }
+
+      .scard {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+      }
+      .sc-val {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 26px;
+      }
+      .sc-lbl {
+        color: var(--muted);
+        font-size: 12.5px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+      }
+      .panel h3 {
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 14px;
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .row3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      @media (max-width: 560px) {
+        .row3 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .field span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .field input,
+      .field select {
+        background: var(--ink);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-family: "Manrope";
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+        width: 100%;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--gold);
+      }
+      .primary {
+        background: linear-gradient(135deg, var(--gold), #caa23f);
+        color: var(--ink);
+        border: none;
+        padding: 12px;
+        border-radius: 12px;
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 14.5px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 2px;
+      }
+      .primary:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+
+      .list {
+        padding: 8px;
+      }
+      .li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .li:last-child {
+        border-bottom: none;
+      }
+      .li-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .li-title {
+        font-weight: 700;
+        font-size: 14.5px;
+      }
+      .badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+      }
+      .fbar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .fpill {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-family: "Manrope";
+        font-weight: 700;
+        font-size: 12.5px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .fpill.on {
+        background: var(--panel2);
+        color: var(--cream);
+        border-color: var(--gold);
+      }
+      .fpill:hover:not(.on) {
+        color: var(--cream);
+      }
+      .delall {
+        margin-right: auto;
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-family: "Manrope";
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: 0.2s;
+      }
+      .delall:hover {
+        color: var(--red);
+      }
+      .pedit {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .pedit-stock {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--line);
+      }
+      .pedit-stock label {
+        color: var(--gold);
+      }
+      .pedit label {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 10.5px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .pedit input {
+        width: 82px;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-family: "Manrope";
+        font-size: 13px;
+        outline: none;
+      }
+      .pedit input:focus {
+        border-color: var(--gold);
+      }
+      .ai-out {
+        margin-top: 12px;
+      }
+      .ai-text {
+        background: rgba(232, 196, 104, 0.06);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: var(--cream);
+        font-size: 13.5px;
+        line-height: 1.75;
+      }
+      .alert-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--cream);
+        line-height: 1.5;
+      }
+      /* ---- mode lecture seule (viewer) ---- */
+      body.viewer-mode .form,
+      body.viewer-mode .del,
+      body.viewer-mode .delall,
+      body.viewer-mode .filebtn,
+      body.viewer-mode .fpill.on[onclick*="recalcCosts"],
+      body.viewer-mode button[onclick*="resetAll"],
+      body.viewer-mode button[onclick*="setGoal"] {
+        display: none !important;
+      }
+      body.viewer-mode .pedit input {
+        pointer-events: none;
+        opacity: 0.7;
+        background: transparent;
+        border-color: transparent;
+      }
+      body.viewer-mode .viewer-badge {
+        display: inline-flex !important;
+      }
+      .viewer-badge {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        background: var(--gold) 22;
+        color: var(--gold);
+        border-radius: 99px;
+        padding: 5px 12px;
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+      .alert-msg b {
+        color: var(--gold);
+      }
+      .goal-bar-bg {
+        height: 10px;
+        background: var(--line);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .goal-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        transition: width 0.4s;
+      }
+      .calc-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .calc-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .calc-ic {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .calc-lbl {
+        flex: 1;
+        color: var(--cream);
+        font-size: 14px;
+      }
+      .calc-val {
+        font-size: 16px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .calc-sep {
+        border-top: 2px solid var(--gold);
+        margin: 8px 0;
+      }
+      .calc-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--cream);
+      }
+      .ai-text b {
+        color: var(--gold);
+      }
+      .searchbox {
+        width: 100%;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-family: "Manrope";
+        font-size: 14px;
+        outline: none;
+        margin: 0 0 10px;
+      }
+      .searchbox:focus {
+        border-color: var(--gold);
+      }
+      .status-sel {
+        background: transparent;
+        border: 1px solid currentColor;
+        border-radius: 99px;
+        padding: 4px 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        font-family: "Manrope";
+        cursor: pointer;
+        outline: none;
+      }
+      .status-sel option {
+        background: var(--panel);
+        color: var(--cream);
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .hd-actions,
+        .tabs,
+        .noprint,
+        .del,
+        .delall,
+        .fpill,
+        .fbar,
+        .filebtn,
+        .primary {
+          display: none !important;
+        }
+        .panel {
+          border: 1px solid #ccc;
+          box-shadow: none;
+          break-inside: avoid;
+        }
+        .hero,
+        .kcard,
+        .scard,
+        .mini,
+        .li-title,
+        .kc-val,
+        .sc-val,
+        .pl,
+        .hero-val,
+        .ai-text {
+          color: #000 !important;
+        }
+        .login {
+          display: none !important;
+        }
+      }
+      .statussel {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 20px;
+        border: 1px solid;
+        cursor: pointer;
+        font-family: "Manrope";
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .statussel option {
+        background: var(--panel2);
+        color: var(--cream);
+      }
+      .li-sub {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .li-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .pl {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .pl.muted {
+        color: var(--muted);
+      }
+      .del {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .del:hover {
+        color: var(--red);
+        background: rgba(240, 140, 140, 0.12);
+      }
+
+      /* chart */
+      .chart-wrap {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        height: 240px;
+        padding-top: 10px;
+        overflow-x: auto;
+      }
+      .bar-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        min-width: 34px;
+        height: 100%;
+      }
+      .bars {
+        display: flex;
+        gap: 3px;
+        align-items: flex-end;
+        flex: 1;
+        width: 100%;
+        justify-content: center;
+      }
+      .bar {
+        width: 11px;
+        border-radius: 4px 4px 0 0;
+        transition: 0.3s;
+      }
+      .bar.in {
+        background: var(--green);
+      }
+      .bar.out {
+        background: var(--red);
+      }
+      .bar-lbl {
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .legend {
+        display: flex;
+        gap: 16px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        display: inline-block;
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.5;
+        margin: -4px 0 2px;
+      }
+      .filebtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        background: rgba(78, 202, 176, 0.12);
+        border: 1px dashed var(--teal);
+        color: var(--teal);
+        padding: 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .filebtn:hover {
+        background: rgba(78, 202, 176, 0.2);
+      }
+      .filebtn input {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login" class="login">
+      <div class="login-card">
+        <div class="logo" style="margin: 0 auto 6px">D</div>
+        <h2 class="login-title">Dawema · Le Comptable</h2>
+        <p class="login-sub">Connecte-toi pour accéder au dashboard</p>
+        <label class="field"
+          ><span>Email</span
+          ><input
+            id="l_user"
+            type="email"
+            placeholder="email@exemple.com"
+            autocomplete="username"
+        /></label>
+        <label class="field"
+          ><span>Mot de passe</span
+          ><input
+            id="l_pass"
+            type="password"
+            placeholder="Mot de passe"
+            autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()"
+        /></label>
+        <p id="l_err" class="login-err"></p>
+        <button class="primary" onclick="doLogin()">Se connecter</button>
+      </div>
+    </div>
+    <div class="wrap" id="appwrap" style="display: none">
+      <div class="hd">
+        <div class="brand">
+          <div class="logo">D</div>
+          <div>
+            <h1>
+              Dawema <span class="sub">· Le Comptable</span>
+              <span class="viewer-badge">👁 Lecture seule</span>
+            </h1>
+            <p class="tag">Recettes, dépenses & profit — en Dinar Tunisien</p>
+          </div>
+        </div>
+        <div class="hd-actions">
+          <button class="ghost" onclick="exportCSV()">⬇ Exporter</button>
+          <button class="ghost danger" onclick="resetAll()">
+            ↺ Réinitialiser
+          </button>
+          <button class="ghost" onclick="logout()">⏻ Déconnexion</button>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+      <div id="view" class="stack"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+      /* ============ CONFIG FIREBASE ============
+   👉 Colle ici la config de TON projet Firebase
+   (Firebase Console → Paramètres du projet → Tes applications → Web) */
+      var firebaseConfig = {
+        apiKey: "AIzaSyAg3eQwQyktrS9jM94Upq1NDKExIORqvl0",
+        authDomain: "dawema-1a265.firebaseapp.com",
+        projectId: "dawema-1a265",
+        storageBucket: "dawema-1a265.firebasestorage.app",
+        messagingSenderId: "221464671913",
+        appId: "1:221464671913:web:ed7479bdc3d7c36a40dbb8",
+      };
+      /* ========================================= */
+      firebase.initializeApp(firebaseConfig);
+      var fbAuth = firebase.auth();
+      var db = firebase.firestore();
+      var dataRef = db.collection("dawema").doc("data");
+
+      /* ====== IA via Cloudflare Worker (AI de Cloudflare, gratuit) ======
+   Le Worker garde tout côté serveur. Aucune clé secrète ici. */
+      var AI_PROXY = "https://dawema-ai.tamagoultm.workers.dev";
+      /* =============================================================== */
+      /* ================================================ */
+    </script>
+
+    <script>
+      /* ---------- state ---------- */
+      var orders = [],
+        expenses = [],
+        products = [];
+      var _writeTimer = null;
+      function save(k, v) {
+        if (_writeTimer) clearTimeout(_writeTimer);
+        _writeTimer = setTimeout(persist, 400);
+      }
+      function persist() {
+        if (!fbAuth.currentUser) return;
+        dataRef
+          .set({ orders: orders, expenses: expenses, products: products })
+          .catch(function (e) {
+            console.error(e);
+            alert("Erreur de sauvegarde : " + e.message);
+          });
+      }
+      function subscribeData() {
+        dataRef.onSnapshot(
+          function (snap) {
+            if (snap.exists) {
+              var d = snap.data();
+              orders = d.orders || [];
+              expenses = d.expenses || [];
+              products = d.products || [];
+            } else {
+              orders = [];
+              expenses = [];
+              products = [];
+            }
+            if (fbAuth.currentUser) render();
+          },
+          function (e) {
+            console.error(e);
+          }
+        );
+      }
+      var tab = "home";
+      var orderFilter = "all";
+      var period = "all";
+      var orderSearch = "";
+      function inPeriod(dstr) {
+        if (period === "all" || !dstr) return true;
+        var t = new Date(dstr);
+        if (isNaN(t.getTime())) return true;
+        var now = new Date();
+        if (period === "month")
+          return (
+            t.getFullYear() === now.getFullYear() &&
+            t.getMonth() === now.getMonth()
+          );
+        var days = period === "7" ? 7 : 30;
+        return t.getTime() >= now.getTime() - days * 86400000;
+      }
+      function setPeriod(p) {
+        period = p;
+        render();
+      }
+
+      /* ---------- utils ---------- */
+      function num(v) {
+        if (typeof v === "number") return isNaN(v) ? 0 : v;
+        var s = String(v == null ? "" : v)
+          .toLowerCase()
+          .replace(/dt|tnd|dinars?|millimes?/g, "");
+        s = s.replace(/[^\d.,\-]/g, "");
+        if (s === "") return 0;
+        if (s.indexOf(",") > -1 && s.indexOf(".") > -1) {
+          if (s.lastIndexOf(",") > s.lastIndexOf("."))
+            s = s.replace(/\./g, "").replace(",", ".");
+          else s = s.replace(/,/g, "");
+        } else if (s.indexOf(",") > -1) {
+          s = s.replace(",", ".");
+        }
+        var n = parseFloat(s);
+        return isNaN(n) ? 0 : n;
+      }
+      function today() {
+        return new Date().toISOString().slice(0, 10);
+      }
+      function uid() {
+        return Math.random().toString(36).slice(2, 9);
+      }
+      function fmt(n) {
+        return (
+          (Math.round(n * 100) / 100).toLocaleString("fr-FR", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          }) + " DT"
+        );
+      }
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
+      }
+      var STATUS = {
+        delivered: { label: "Livrée", color: "var(--green)" },
+        pending: { label: "En attente", color: "var(--gold)" },
+        returned: { label: "Retour", color: "var(--red)" },
+      };
+
+      /* ---------- KPIs ---------- */
+      function kpis() {
+        var d = orders.filter(function (o) {
+          return o.status === "delivered" && inPeriod(o.date);
+        });
+        var r = orders.filter(function (o) {
+          return o.status === "returned" && inPeriod(o.date);
+        });
+        var p = orders.filter(function (o) {
+          return o.status === "pending" && inPeriod(o.date);
+        });
+        var revenue = d.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = d.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var deliv =
+          d.reduce(function (s, o) {
+            return s + num(o.delivery);
+          }, 0) +
+          r.reduce(function (s, o) {
+            return s + num(o.returnFee);
+          }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads" && inPeriod(e.date);
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var achat = expenses
+          .filter(function (e) {
+            return e.type === "achat" && inPeriod(e.date);
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var emballage = expenses
+          .filter(function (e) {
+            return e.type === "emballage" && inPeriod(e.date);
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var other = expenses
+          .filter(function (e) {
+            return (
+              e.type !== "ads" &&
+              e.type !== "achat" &&
+              e.type !== "emballage" &&
+              inPeriod(e.date)
+            );
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var out = achat + emballage + deliv + ads + other,
+          profit = revenue - out;
+        var totalDR = d.length + r.length;
+        return {
+          revenue: revenue,
+          cogs: cogs,
+          deliv: deliv,
+          ads: ads,
+          achat: achat,
+          emballage: emballage,
+          other: other,
+          out: out,
+          profit: profit,
+          margin: revenue > 0 ? (profit / revenue) * 100 : 0,
+          roas: ads > 0 ? revenue / ads : 0,
+          deliveryRate: totalDR > 0 ? (d.length / totalDR) * 100 : 0,
+          profitPerOrder: d.length > 0 ? profit / d.length : 0,
+          nD: d.length,
+          nR: r.length,
+          nP: p.length,
+          nT: d.length + r.length + p.length,
+        };
+      }
+      function daily() {
+        var m = {};
+        orders.forEach(function (o) {
+          var dt = o.date || today();
+          m[dt] = m[dt] || { date: dt, in: 0, out: 0 };
+          if (o.status === "delivered") {
+            m[dt].in += num(o.sell);
+            m[dt].out += num(o.buy) + num(o.delivery);
+          } else if (o.status === "returned") {
+            m[dt].out += num(o.returnFee);
+          }
+        });
+        expenses.forEach(function (e) {
+          var dt = e.date || today();
+          m[dt] = m[dt] || { date: dt, in: 0, out: 0 };
+          m[dt].out += num(e.amount);
+        });
+        return Object.keys(m)
+          .map(function (k) {
+            return m[k];
+          })
+          .sort(function (a, b) {
+            return a.date.localeCompare(b.date);
+          })
+          .slice(-14);
+      }
+
+      /* ---------- render ---------- */
+      var TABS = [
+        ["home", "Accueil"],
+        ["orders", "Commandes"],
+        ["expenses", "Dépenses"],
+        ["products", "Produits"],
+        ["stock", "📦 Stock"],
+        ["analyse", "📊 Analyse"],
+        ["rapports", "📈 Rapports"],
+        ["marge", "💼 Marge Marketing"],
+      ];
+      function renderTabs() {
+        document.getElementById("tabs").innerHTML = TABS.map(function (t) {
+          return (
+            '<button class="tab ' +
+            (tab === t[0] ? "on" : "") +
+            '" onclick="go(\'' +
+            t[0] +
+            "')\">" +
+            t[1] +
+            "</button>"
+          );
+        }).join("");
+      }
+      function go(t) {
+        tab = t;
+        render();
+      }
+
+      function render() {
+        document.body.classList.toggle("viewer-mode", isViewer);
+        renderTabs();
+        var v = document.getElementById("view");
+        if (tab === "home") v.innerHTML = viewHome();
+        else if (tab === "orders") v.innerHTML = viewOrders();
+        else if (tab === "expenses") v.innerHTML = viewExpenses();
+        else if (tab === "products") v.innerHTML = viewProducts();
+        else if (tab === "stock") v.innerHTML = viewStock();
+        else if (tab === "analyse") v.innerHTML = viewAnalyse();
+        else if (tab === "rapports") v.innerHTML = viewRapports();
+        else if (tab === "marge") v.innerHTML = viewMargeMarketing();
+      }
+
+      function viewHome() {
+        var k = kpis(),
+          d = daily();
+
+        /* ---- فلتر ---- */
+        var fbar =
+          '<div class="fbar">' +
+          [
+            ["all", "Tout"],
+            ["month", "Ce mois"],
+            ["30", "30 jours"],
+            ["7", "7 jours"],
+          ]
+            .map(function (x) {
+              return (
+                '<button class="fpill ' +
+                (period === x[0] ? "on" : "") +
+                '" onclick="setPeriod(\'' +
+                x[0] +
+                "')\">" +
+                x[1] +
+                "</button>"
+              );
+            })
+            .join("") +
+          "</div>";
+
+        /* ---- 1) ALERTES ---- */
+        var alerts = buildAlerts(k);
+        var alertsHtml =
+          alerts.length === 0
+            ? ""
+            : '<div class="panel" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">' +
+              alerts
+                .map(function (a) {
+                  return (
+                    '<div class="alert-row"><span>' +
+                    a.ic +
+                    '</span><span class="alert-msg">' +
+                    a.msg +
+                    "</span></div>"
+                  );
+                })
+                .join("") +
+              "</div>";
+
+        /* ---- 2) HERO ---- */
+        var hero =
+          '<div class="hero"><div class="hero-l">' +
+          '<span class="hero-lbl">Profit net</span>' +
+          '<span class="hero-val ' +
+          (k.profit >= 0 ? "pos" : "neg") +
+          '">' +
+          fmt(k.profit) +
+          "</span>" +
+          '<span class="hero-meta">Marge ' +
+          k.margin.toFixed(1) +
+          "% · Profit/commande " +
+          fmt(k.profitPerOrder) +
+          "</span>" +
+          '</div><div class="hero-r">' +
+          mini("Recettes", fmt(k.revenue), "var(--green)") +
+          mini("Frais livraison", fmt(k.deliv), "var(--red)") +
+          mini("ROAS", k.roas ? k.roas.toFixed(2) + "x" : "—", "var(--gold)") +
+          "</div></div>";
+
+        /* ---- 3) KPI CARDS ---- */
+        var cards =
+          '<div class="grid4">' +
+          card("📣", "Publicité (Ads)", fmt(k.ads), "var(--gold)") +
+          card("📦", "Achat produits", fmt(k.achat), "var(--teal)") +
+          card("📫", "Emballage / Logistique", fmt(k.emballage), "#a78bfa") +
+          card("👛", "Autres dépenses", fmt(k.other), "var(--muted)") +
+          "</div>" +
+          '<div class="grid3">' +
+          stat("Livrées", k.nD, "var(--green)") +
+          stat("Retours", k.nR, "var(--red)") +
+          stat("En attente", k.nP, "var(--gold)") +
+          "</div>" +
+          '<div class="grid2">' +
+          stat(
+            "Taux de livraison",
+            k.deliveryRate.toFixed(0) + "%",
+            "var(--teal)"
+          ) +
+          stat("Total commandes", k.nT, "var(--cream)") +
+          "</div>";
+
+        /* ---- 4) OBJECTIF MENSUEL ---- */
+        var goal = getGoal();
+        var now = new Date();
+        var daysInMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0
+        ).getDate();
+        var dayLeft = daysInMonth - now.getDate();
+        var curKey = now.getFullYear() + "-" + pad(now.getMonth() + 1);
+        var curM = monthData().filter(function (m) {
+          return m.key === curKey;
+        })[0];
+        var curP = curM ? curM.profit : 0;
+        var pct = goal > 0 ? Math.min(100, Math.round((curP / goal) * 100)) : 0;
+        var gc =
+          pct >= 100
+            ? "var(--green)"
+            : pct >= 60
+            ? "var(--gold)"
+            : "var(--red)";
+        var goalHtml =
+          '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+          '<h3 style="margin:0">🎯 Objectif mensuel</h3>' +
+          '<button class="fpill on" onclick="setGoal()" style="font-size:12px">✏️ Modifier</button></div>' +
+          (goal === 0
+            ? '<p class="hint" style="margin:0">Pas encore d\'objectif. <button class="primary" style="display:inline;padding:6px 14px;font-size:13px;margin-left:8px" onclick="setGoal()">Définir</button></p>'
+            : '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--muted)">Profit ce mois</span><span style="color:' +
+              gc +
+              ';font-weight:700">' +
+              fmt(curP) +
+              " / " +
+              fmt(goal) +
+              "</span></div>" +
+              '<div class="goal-bar-bg"><div class="goal-bar-fill" style="width:' +
+              pct +
+              "%;background:" +
+              gc +
+              '"></div></div>' +
+              '<div style="margin-top:8px;font-size:13px;color:var(--muted)">' +
+              (pct >= 100
+                ? "✅ Objectif atteint ! Félicitations 🎉"
+                : '<span style="color:' +
+                  gc +
+                  '">' +
+                  pct +
+                  "%</span> atteint · " +
+                  dayLeft +
+                  " jours restants" +
+                  (dayLeft > 0 && curP < goal
+                    ? ' · Besoin de <b style="color:var(--cream)">' +
+                      fmt((goal - curP) / Math.max(1, dayLeft)) +
+                      "</b>/jour"
+                    : "")) +
+              "</div>") +
+          "</div>";
+
+        /* ---- 5) GRAPHIQUE ---- */
+        var maxV = Math.max(
+          1,
+          Math.max.apply(
+            null,
+            d.map(function (x) {
+              return Math.max(x.in, x.out);
+            })
+          )
+        );
+        var bars =
+          d.length === 0
+            ? '<p class="empty">Pas encore de données.</p>'
+            : '<div class="chart-wrap">' +
+              d
+                .map(function (x) {
+                  return (
+                    '<div class="bar-group"><div class="bars">' +
+                    '<div class="bar in" style="height:' +
+                    (x.in / maxV) * 100 +
+                    '%" title="Recettes ' +
+                    fmt(x.in) +
+                    '"></div>' +
+                    '<div class="bar out" style="height:' +
+                    (x.out / maxV) * 100 +
+                    '%" title="Dépenses ' +
+                    fmt(x.out) +
+                    '"></div>' +
+                    '</div><div class="bar-lbl">' +
+                    x.date.slice(5) +
+                    "</div></div>"
+                  );
+                })
+                .join("") +
+              "</div>" +
+              '<div class="legend"><span><i class="dot" style="background:var(--green)"></i>Recettes</span><span><i class="dot" style="background:var(--red)"></i>Dépenses</span></div>';
+        var chartHtml =
+          '<div class="panel"><h3>📅 Recettes vs dépenses · 14 derniers jours</h3>' +
+          bars +
+          "</div>";
+
+        return fbar + alertsHtml + hero + cards + goalHtml + chartHtml;
+      }
+
+      function getGoal() {
+        try {
+          return num(localStorage.getItem("dawema_goal") || "0");
+        } catch (e) {
+          return 0;
+        }
+      }
+      function setGoal() {
+        var cur = getGoal();
+        var v = prompt("Objectif de profit mensuel (DT) :", cur > 0 ? cur : "");
+        if (v === null) return;
+        try {
+          localStorage.setItem("dawema_goal", num(v));
+        } catch (e) {}
+        render();
+      }
+      function buildAlerts(k) {
+        var a = [];
+        /* objectif mensuel */
+        var goal = getGoal();
+        if (goal > 0) {
+          var now = new Date();
+          var curKey = now.getFullYear() + "-" + pad(now.getMonth() + 1);
+          var curM = monthData().filter(function (m) {
+            return m.key === curKey;
+          })[0];
+          var curP = curM ? curM.profit : 0;
+          var pct = Math.round((curP / goal) * 100);
+          var daysInMonth = new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            0
+          ).getDate();
+          var dayPassed = now.getDate();
+          var dayLeft = daysInMonth - dayPassed;
+          if (curP >= goal)
+            a.push({
+              ic: "🎯",
+              msg:
+                "Objectif du mois atteint ! Tu as réalisé <b>" +
+                fmt(curP) +
+                "</b> / <b>" +
+                fmt(goal) +
+                "</b> DT 🎉",
+            });
+          else if (dayLeft <= 7 && pct < 70)
+            a.push({
+              ic: "⚡",
+              msg:
+                "Objectif en danger : <b>" +
+                pct +
+                "%</b> atteint, il reste <b>" +
+                dayLeft +
+                "</b> jours. Besoin de <b>" +
+                fmt((goal - curP) / Math.max(1, dayLeft)) +
+                "</b>/jour",
+            });
+        }
+        /* comparaison mois */
+        var M = monthData();
+        var cur = M[0];
+        var prev = M[1];
+        if (cur && prev && prev.profit !== 0) {
+          var diff = cur.profit - prev.profit;
+          var pctM = Math.round((Math.abs(diff) / Math.abs(prev.profit)) * 100);
+          if (diff > 0)
+            a.push({
+              ic: "📈",
+              msg:
+                "Ce mois le profit a augmenté de <b>" +
+                fmt(diff) +
+                "</b> vs le mois dernier (+" +
+                pctM +
+                "%)",
+            });
+          else if (diff < 0)
+            a.push({
+              ic: "📉",
+              msg:
+                "Ce mois le profit a baissé de <b>" +
+                fmt(Math.abs(diff)) +
+                "</b> vs le mois dernier (−" +
+                pctM +
+                "%)",
+            });
+        }
+        /* taux retour */
+        var tot = k.nD + k.nR;
+        var retPct = tot > 0 ? Math.round((k.nR / tot) * 100) : 0;
+        if (retPct >= 30)
+          a.push({
+            ic: "⚠️",
+            msg:
+              "Taux de retour élevé : <b>" +
+              retPct +
+              "%</b> des commandes retournées",
+          });
+        else if (retPct > 0 && retPct < 30)
+          a.push({ ic: "↩️", msg: "Taux de retour : <b>" + retPct + "%</b>" });
+        /* ROAS */
+        if (k.ads > 0 && k.roas < 2)
+          a.push({
+            ic: "📣",
+            msg:
+              "ROAS faible (<b>" +
+              k.roas.toFixed(2) +
+              "x</b>) — chaque 1 DT pub rapporte " +
+              k.roas.toFixed(2) +
+              " DT",
+          });
+        /* perte */
+        if (k.profit < 0)
+          a.push({
+            ic: "🔴",
+            msg:
+              "Tu es en perte de <b>" +
+              fmt(Math.abs(k.profit)) +
+              "</b> sur cette période",
+          });
+        var low = lowStockAlerts();
+        if (low.length > 0) {
+          var names = low
+            .map(function (p) {
+              return p.name + " (" + p.stock + ")";
+            })
+            .join(", ");
+          a.push({
+            ic: "📦",
+            msg:
+              "Stock faible : <b>" + names + "</b> — pense à réapprovisionner",
+          });
+        }
+        return a;
+      }
+      function periodLabel() {
+        var L = { all: "(tout)", month: "(ce mois)", 30: "(30j)", 7: "(7j)" };
+        return L[period] || "";
+      }
+      function mini(l, v, c) {
+        return (
+          '<div class="mini"><span class="mini-lbl">' +
+          l +
+          '</span><span class="mini-val" style="color:' +
+          c +
+          '">' +
+          v +
+          "</span></div>"
+        );
+      }
+      function card(ic, l, v, c) {
+        return (
+          '<div class="kcard"><div class="kc-ic" style="color:' +
+          c +
+          ";background:" +
+          c +
+          '1f">' +
+          ic +
+          '</div><div><div class="kc-lbl">' +
+          l +
+          '</div><div class="kc-val">' +
+          v +
+          "</div></div></div>"
+        );
+      }
+      function stat(l, v, c) {
+        return (
+          '<div class="scard"><div class="sc-val" style="color:' +
+          c +
+          '">' +
+          v +
+          '</div><div class="sc-lbl">' +
+          l +
+          "</div></div>"
+        );
+      }
+
+      function viewOrders() {
+        var psel = products.length
+          ? '<label class="field"><span>Choisir un produit (remplit les prix)</span><select id="o_prod" onchange="pickProd()"><option value="">— manuel —</option>' +
+            products
+              .map(function (p) {
+                return (
+                  '<option value="' + p.id + '">' + esc(p.name) + "</option>"
+                );
+              })
+              .join("") +
+            "</select></label>"
+          : "";
+        var form =
+          '<div class="panel form"><h3>+ Ajouter une commande</h3>' +
+          psel +
+          f("Produit", '<input id="o_prodname" placeholder="Nom du produit">') +
+          '<div class="row3">' +
+          f(
+            "Prix de vente",
+            '<input id="o_sell" type="number" placeholder="0">'
+          ) +
+          f(
+            "Prix d'achat",
+            '<input id="o_buy" type="number" placeholder="0">'
+          ) +
+          f("Livraison", '<input id="o_deliv" type="number" placeholder="0">') +
+          "</div>" +
+          '<div class="row3">' +
+          f(
+            "Statut",
+            '<select id="o_status" onchange="toggleRet()"><option value="delivered">Livrée</option><option value="pending">En attente</option><option value="returned">Retour</option></select>'
+          ) +
+          '<label class="field" id="o_retwrap" style="display:none"><span>Frais de retour</span><input id="o_ret" type="number" placeholder="0"></label>' +
+          f("Date", '<input id="o_date" type="date" value="' + today() + '">') +
+          "</div>" +
+          f(
+            "Note / client (optionnel)",
+            '<input id="o_note" placeholder="Nom du client, numéro…">'
+          ) +
+          f(
+            "Ville (optionnel)",
+            '<input id="o_city" placeholder="ex: Tunis, Sfax…">'
+          ) +
+          '<button class="primary" onclick="addOrder()">+ Enregistrer la commande</button></div>';
+
+        var cAll = orders.length,
+          cD = orders.filter(function (o) {
+            return o.status === "delivered";
+          }).length,
+          cP = orders.filter(function (o) {
+            return o.status === "pending";
+          }).length,
+          cR = orders.filter(function (o) {
+            return o.status === "returned";
+          }).length;
+        var fdefs = [
+          ["all", "Toutes", cAll],
+          ["delivered", "Livrées", cD],
+          ["pending", "En attente", cP],
+          ["returned", "Retour", cR],
+        ];
+        var fbar =
+          '<div class="fbar">' +
+          fdefs
+            .map(function (x) {
+              return (
+                '<button class="fpill ' +
+                (orderFilter === x[0] ? "on" : "") +
+                '" onclick="setFilter(\'' +
+                x[0] +
+                "')\">" +
+                x[1] +
+                " (" +
+                x[2] +
+                ")</button>"
+              );
+            })
+            .join("") +
+          (orders.length
+            ? '<button class="delall" onclick="delAllOrders()">🗑 Supprimer toutes</button>'
+            : "") +
+          "</div>";
+
+        var shown = orders.filter(function (o) {
+          return orderFilter === "all" || o.status === orderFilter;
+        });
+        var rows =
+          shown.length === 0
+            ? '<p class="empty">Aucune commande' +
+              (orderFilter !== "all" ? " dans ce filtre" : "") +
+              ".</p>"
+            : shown
+                .map(function (o) {
+                  var st = STATUS[o.status],
+                    profit = num(o.sell) - num(o.buy) - num(o.delivery);
+                  var right =
+                    o.status === "delivered"
+                      ? '<span class="pl" style="color:' +
+                        (profit >= 0 ? "var(--green)" : "var(--red)") +
+                        '">' +
+                        fmt(profit) +
+                        "</span>"
+                      : '<span class="pl muted">' +
+                        fmt(num(o.sell)) +
+                        "</span>";
+                  var title = o.product || o.note || "Commande";
+                  var client =
+                    o.note && o.note !== title ? esc(o.note) + " · " : "";
+                  var statusSel =
+                    '<select class="status-sel" style="color:' +
+                    st.color +
+                    '" onchange="setOrderStatus(\'' +
+                    o.id +
+                    "',this.value)\">" +
+                    ["delivered", "pending", "returned"]
+                      .map(function (s) {
+                        return (
+                          '<option value="' +
+                          s +
+                          '"' +
+                          (o.status === s ? " selected" : "") +
+                          ">" +
+                          STATUS[s].label +
+                          "</option>"
+                        );
+                      })
+                      .join("") +
+                    "</select>";
+                  return (
+                    '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                    esc(title) +
+                    "</span>" +
+                    statusSel +
+                    "</div>" +
+                    '<div class="li-sub">' +
+                    client +
+                    o.date +
+                    " · Vente " +
+                    fmt(num(o.sell)) +
+                    " · Achat " +
+                    fmt(num(o.buy)) +
+                    " · Livraison " +
+                    fmt(num(o.delivery)) +
+                    "</div></div>" +
+                    '<div class="li-right">' +
+                    right +
+                    '<button class="del" onclick="delOrder(\'' +
+                    o.id +
+                    "')\">🗑</button></div></div>"
+                  );
+                })
+                .join("");
+        var search =
+          '<input id="o_search" class="searchbox" placeholder="🔎 Rechercher (nom, produit, ville…)" oninput="filterOrders(this.value)" value="' +
+          esc(orderSearch) +
+          '">';
+        var list =
+          '<div class="panel">' +
+          fbar +
+          search +
+          '<div class="list" id="orders_list" style="padding:0">' +
+          rows +
+          "</div></div>";
+        return importCard() + form + list;
+      }
+      function filterOrders(q) {
+        orderSearch = q;
+        var ql = (q || "").toLowerCase();
+        var box = document.getElementById("orders_list");
+        if (!box) return;
+        var items = box.getElementsByClassName("li");
+        for (var i = 0; i < items.length; i++) {
+          var t = (items[i].textContent || "").toLowerCase();
+          items[i].style.display = !ql || t.indexOf(ql) > -1 ? "" : "none";
+        }
+      }
+      function setFilter(fl) {
+        orderFilter = fl;
+        render();
+      }
+      function delAllOrders() {
+        if (!confirm("Supprimer TOUTES les commandes ? Action irréversible."))
+          return;
+        orders = [];
+        save("orders", orders);
+        render();
+      }
+      function pickProd() {
+        var id = document.getElementById("o_prod").value;
+        var p = products.filter(function (x) {
+          return x.id === id;
+        })[0];
+        if (p) {
+          document.getElementById("o_sell").value = p.sell;
+          document.getElementById("o_buy").value = p.buy;
+          document.getElementById("o_deliv").value = p.delivery;
+          document.getElementById("o_prodname").value = p.name;
+        }
+      }
+      function toggleRet() {
+        document.getElementById("o_retwrap").style.display =
+          document.getElementById("o_status").value === "returned"
+            ? "flex"
+            : "none";
+      }
+      function addOrder() {
+        var sell = document.getElementById("o_sell").value,
+          buy = document.getElementById("o_buy").value;
+        if (!sell && !buy) return;
+        var prodname = document.getElementById("o_prodname").value;
+        var qty = lineQty(prodname) || 1;
+        var status = document.getElementById("o_status").value;
+        orders.unshift({
+          id: uid(),
+          sell: sell,
+          buy: buy,
+          delivery: document.getElementById("o_deliv").value,
+          status: status,
+          returnFee: (document.getElementById("o_ret") || {}).value || "",
+          date: document.getElementById("o_date").value || today(),
+          note: document.getElementById("o_note").value,
+          city: (document.getElementById("o_city") || {}).value || "",
+          product: prodname,
+        });
+        if (status === "delivered") adjustStock(prodname, qty, -1);
+        save("orders", orders);
+        save("products", products);
+        render();
+      }
+      function delOrder(id) {
+        var o = orders.filter(function (x) {
+          return x.id === id;
+        })[0];
+        if (o && o.status === "delivered") {
+          var q = lineQty(o.product) || 1;
+          adjustStock(o.product, q, 1);
+        }
+        orders = orders.filter(function (x) {
+          return x.id !== id;
+        });
+        save("orders", orders);
+        save("products", products);
+        render();
+      }
+      function setOrderStatus(id, newStatus) {
+        var o = orders.filter(function (x) {
+          return x.id === id;
+        })[0];
+        if (!o) return;
+        var oldStatus = o.status;
+        if (oldStatus === newStatus) return;
+        var q = lineQty(o.product) || 1;
+        /* retire le stock retiré si on quitte "delivered" */
+        if (oldStatus === "delivered" && newStatus !== "delivered")
+          adjustStock(o.product, q, 1);
+        /* retire du stock si on passe à "delivered" */
+        if (oldStatus !== "delivered" && newStatus === "delivered")
+          adjustStock(o.product, q, -1);
+        o.status = newStatus;
+        save("orders", orders);
+        save("products", products);
+        render();
+      }
+
+      function viewExpenses() {
+        var form =
+          '<div class="panel form"><h3>+ Ajouter une dépense</h3>' +
+          '<div class="row3">' +
+          f(
+            "Type",
+            '<select id="e_type"><option value="ads">📣 Publicité (Meta Ads)</option><option value="achat">📦 Achat produits</option><option value="emballage">📫 Emballage / Logistique</option><option value="other">👛 Autre</option></select>'
+          ) +
+          f("Montant", '<input id="e_amt" type="number" placeholder="0">') +
+          f("Date", '<input id="e_date" type="date" value="' + today() + '">') +
+          "</div>" +
+          f(
+            "Description (optionnel)",
+            '<input id="e_desc" placeholder="ex: Achat 100 moules, campagne Meta…">'
+          ) +
+          '<button class="primary" onclick="addExp()">+ Enregistrer la dépense</button></div>';
+
+        var EXP_TYPES = {
+          ads: { label: "Pub", color: "var(--gold)" },
+          achat: { label: "Achat", color: "var(--teal)" },
+          emballage: { label: "Emballage", color: "#a78bfa" },
+          other: { label: "Autre", color: "var(--muted)" },
+        };
+        var list =
+          expenses.length === 0
+            ? '<div class="panel"><p class="empty">Aucune dépense.</p></div>'
+            : '<div class="panel"><div class="fbar"><button class="delall" onclick="delAllExpenses()">🗑 Supprimer toutes</button></div><div class="list" style="padding:0">' +
+              expenses
+                .map(function (e) {
+                  var t = EXP_TYPES[e.type] || EXP_TYPES.other;
+                  return (
+                    '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                    esc(e.desc || t.label) +
+                    "</span>" +
+                    '<span class="badge" style="color:' +
+                    t.color +
+                    ";background:" +
+                    t.color +
+                    '22">' +
+                    t.label +
+                    "</span></div>" +
+                    '<div class="li-sub">' +
+                    e.date +
+                    "</div></div>" +
+                    '<div class="li-right"><span class="pl" style="color:var(--red)">− ' +
+                    fmt(num(e.amount)) +
+                    "</span>" +
+                    '<button class="del" onclick="delExp(\'' +
+                    e.id +
+                    "')\">🗑</button></div></div>"
+                  );
+                })
+                .join("") +
+              "</div></div>";
+        return form + list;
+      }
+      function delAllExpenses() {
+        if (!confirm("Supprimer TOUTES les dépenses ? Action irréversible."))
+          return;
+        expenses = [];
+        save("expenses", expenses);
+        render();
+      }
+      function addExp() {
+        var amt = document.getElementById("e_amt").value;
+        if (!amt) return;
+        expenses.unshift({
+          id: uid(),
+          type: document.getElementById("e_type").value,
+          amount: amt,
+          desc: document.getElementById("e_desc").value,
+          date: document.getElementById("e_date").value || today(),
+        });
+        save("expenses", expenses);
+        render();
+      }
+      function delExp(id) {
+        expenses = expenses.filter(function (e) {
+          return e.id !== id;
+        });
+        save("expenses", expenses);
+        render();
+      }
+
+      function viewProducts() {
+        var form =
+          '<div class="panel form"><h3>+ Ajouter un produit</h3>' +
+          f("Nom", '<input id="p_name" placeholder="Nom du produit">') +
+          '<div class="row3">' +
+          f(
+            "Prix de vente",
+            '<input id="p_sell" type="number" placeholder="0">'
+          ) +
+          f(
+            "Prix d'achat",
+            '<input id="p_buy" type="number" placeholder="0">'
+          ) +
+          f("Livraison", '<input id="p_deliv" type="number" placeholder="0">') +
+          "</div>" +
+          '<button class="primary" onclick="addProd()">+ Enregistrer le produit</button></div>';
+        var tools = products.length
+          ? '<div class="panel"><div class="fbar">' +
+            '<button class="fpill on" onclick="recalcCosts()">♻ Recalculer les coûts</button>' +
+            '<button class="delall" onclick="delAllProducts()">🗑 Supprimer tous</button></div>' +
+            '<p class="hint" style="margin:0">Remplis le <b>Prix d\'achat</b> de chaque produit, puis clique <b>Recalculer les coûts</b> pour l\'appliquer à toutes les commandes.</p></div>'
+          : "";
+        var list =
+          products.length === 0
+            ? '<div class="panel"><p class="empty">Aucun produit. Importe un CSV ou ajoute-les manuellement.</p></div>'
+            : '<div class="panel list">' +
+              products
+                .map(function (p) {
+                  var marge = num(p.sell) - num(p.buy) - num(p.delivery);
+                  return (
+                    '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                    esc(p.name) +
+                    "</span>" +
+                    '<span class="badge" style="color:var(--teal);background:var(--teal)22">Marge ' +
+                    fmt(marge) +
+                    "</span></div>" +
+                    '<div class="pedit">' +
+                    '<label>Vente<input type="number" value="' +
+                    esc(p.sell) +
+                    '" onchange="setProd(\'' +
+                    p.id +
+                    "','sell',this.value)\"></label>" +
+                    '<label>Achat<input type="number" value="' +
+                    esc(p.buy) +
+                    '" onchange="setProd(\'' +
+                    p.id +
+                    "','buy',this.value)\"></label>" +
+                    '<label>Livraison<input type="number" value="' +
+                    esc(p.delivery) +
+                    '" onchange="setProd(\'' +
+                    p.id +
+                    "','delivery',this.value)\"></label>" +
+                    "</div></div>" +
+                    '<div class="li-right"><button class="del" onclick="delProd(\'' +
+                    p.id +
+                    "')\">🗑</button></div></div>"
+                  );
+                })
+                .join("") +
+              "</div>";
+        return form + tools + list;
+      }
+      function setProd(id, field, val) {
+        for (var i = 0; i < products.length; i++) {
+          if (products[i].id === id) {
+            products[i][field] = val;
+            break;
+          }
+        }
+        save("products", products);
+      }
+      function delAllProducts() {
+        if (!confirm("Supprimer TOUS les produits ? Action irréversible."))
+          return;
+        products = [];
+        save("products", products);
+        render();
+      }
+      function addProd() {
+        var name = document.getElementById("p_name").value;
+        if (!name) return;
+        products.unshift({
+          id: uid(),
+          name: name,
+          sell: document.getElementById("p_sell").value,
+          buy: document.getElementById("p_buy").value,
+          delivery: document.getElementById("p_deliv").value,
+          stock: "",
+          stockAlert: "",
+        });
+        save("products", products);
+        render();
+      }
+      function delProd(id) {
+        products = products.filter(function (p) {
+          return p.id !== id;
+        });
+        save("products", products);
+        render();
+      }
+
+      /* ---------- gestion du stock ---------- */
+      function findProductByOrderName(prodStr) {
+        if (!prodStr || !products.length) return null;
+        var first = String(prodStr).split("|")[0] || "";
+        var nm = cleanName(first).toLowerCase();
+        for (var i = 0; i < products.length; i++) {
+          var pn = (products[i].name || "").toLowerCase().trim();
+          if (pn && nm.indexOf(pn) > -1) return products[i];
+        }
+        return null;
+      }
+      function adjustStock(prodStr, qty, delta) {
+        var p = findProductByOrderName(prodStr);
+        if (!p || p.stock === undefined || p.stock === null || p.stock === "")
+          return;
+        var cur = num(p.stock);
+        p.stock = String(cur + delta * qty);
+        save("products", products);
+      }
+      function lowStockAlerts() {
+        return products.filter(function (p) {
+          if (p.stock === undefined || p.stock === null || p.stock === "")
+            return false;
+          var alert = num(p.stockAlert);
+          return alert > 0 && num(p.stock) <= alert;
+        });
+      }
+
+      /* ===================== PAGE GESTION DU STOCK ===================== */
+      function viewStock() {
+        if (products.length === 0)
+          return '<div class="panel"><p class="empty">Aucun produit. Crée d\'abord tes produits dans l\'onglet <b>Produits</b>.</p></div>';
+        var withStock = products.filter(function (p) {
+          return p.stock !== undefined && p.stock !== null && p.stock !== "";
+        });
+        var totalUnits = withStock.reduce(function (s, p) {
+          return s + num(p.stock);
+        }, 0);
+        var low = lowStockAlerts();
+
+        var summary =
+          '<div class="grid3">' +
+          stat("Produits suivis", withStock.length, "var(--teal)") +
+          stat("Unités en stock", totalUnits, "var(--green)") +
+          stat(
+            "Alertes stock faible",
+            low.length,
+            low.length > 0 ? "var(--red)" : "var(--teal)"
+          ) +
+          "</div>";
+
+        var alertsHtml =
+          low.length === 0
+            ? ""
+            : '<div class="panel" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">' +
+              low
+                .map(function (p) {
+                  return (
+                    '<div class="alert-row"><span>⚠️</span><span class="alert-msg"><b>' +
+                    esc(p.name) +
+                    "</b> — il ne reste que <b>" +
+                    p.stock +
+                    "</b> unité(s) (seuil : " +
+                    p.stockAlert +
+                    ")</span></div>"
+                  );
+                })
+                .join("") +
+              "</div>";
+
+        var rows =
+          '<div class="panel list">' +
+          products
+            .map(function (p) {
+              var stock =
+                p.stock === undefined || p.stock === "" ? null : num(p.stock);
+              var alert = num(p.stockAlert) || 0;
+              var isLow = stock !== null && alert > 0 && stock <= alert;
+              var badge =
+                stock === null
+                  ? '<span class="badge" style="color:var(--muted);background:var(--muted)22">Non suivi</span>'
+                  : '<span class="badge" style="color:' +
+                    (isLow ? "var(--red)" : "var(--teal)") +
+                    ";background:" +
+                    (isLow ? "var(--red)" : "var(--teal)") +
+                    '22">' +
+                    (isLow ? "⚠️ " : "📦 ") +
+                    stock +
+                    " en stock</span>";
+              return (
+                '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                esc(p.name) +
+                "</span>" +
+                badge +
+                "</div>" +
+                '<div class="pedit">' +
+                '<label>📦 Stock actuel<input type="number" value="' +
+                esc(p.stock) +
+                '" placeholder="—" onchange="setProd(\'' +
+                p.id +
+                "','stock',this.value)\"></label>" +
+                '<label>🔔 Alerte si ≤<input type="number" value="' +
+                esc(p.stockAlert) +
+                '" placeholder="5" onchange="setProd(\'' +
+                p.id +
+                "','stockAlert',this.value)\"></label>" +
+                '<button class="fpill" style="margin-top:auto" onclick="adjustStockBtn(\'' +
+                p.id +
+                "',1)\">+1</button>" +
+                '<button class="fpill" style="margin-top:auto" onclick="adjustStockBtn(\'' +
+                p.id +
+                "',-1)\">−1</button>" +
+                "</div></div></div>"
+              );
+            })
+            .join("") +
+          "</div>";
+
+        return (
+          '<div class="panel"><h3>📦 Gestion du stock</h3>' +
+          '<p class="hint" style="margin:-4px 0 12px">Le stock diminue automatiquement quand une commande passe à <b>Livrée</b>, et revient quand elle passe en <b>Retour</b> ou <b>En attente</b>.</p>' +
+          summary +
+          "</div>" +
+          alertsHtml +
+          '<div class="panel"><h3>📋 Détail par produit</h3></div>' +
+          rows
+        );
+      }
+      function adjustStockBtn(id, delta) {
+        for (var i = 0; i < products.length; i++) {
+          if (products[i].id === id) {
+            var cur =
+              products[i].stock === undefined || products[i].stock === ""
+                ? 0
+                : num(products[i].stock);
+            products[i].stock = String(cur + delta);
+            break;
+          }
+        }
+        save("products", products);
+        render();
+      }
+      /* =================================================================== */
+
+      /* ---------- CSV import ---------- */
+      function importCard() {
+        return (
+          '<div class="panel form"><h3>⬆ Importer un CSV</h3>' +
+          '<p class="hint">Importe tes commandes existantes (export Convertly, etc.). Les colonnes sont détectées automatiquement. ' +
+          "⚠️ Le coût d'achat n'existe pas dans l'export : crée d'abord tes <b>Produits</b> (avec prix d'achat) pour un profit correct.</p>" +
+          '<label class="filebtn">📄 Choisir un fichier CSV<input type="file" accept=".csv,text/csv" onchange="importCSV(event)"></label></div>'
+        );
+      }
+      function pad(x) {
+        x = String(x);
+        return x.length < 2 ? "0" + x : x;
+      }
+      function parseDate(s) {
+        if (!s) return today();
+        s = String(s).split(",")[0].split(" ")[0].trim();
+        var p = s.split(/[\/\-\.]/);
+        if (p.length === 3) {
+          if (p[0].length === 4)
+            return p[0] + "-" + pad(p[1]) + "-" + pad(p[2]);
+          return p[2] + "-" + pad(p[1]) + "-" + pad(p[0]);
+        }
+        var d = new Date(s);
+        return isNaN(d.getTime()) ? today() : d.toISOString().slice(0, 10);
+      }
+      function mapStatus(s) {
+        s = (s || "").toLowerCase().trim();
+        if (
+          s.indexOf("retour") > -1 ||
+          s.indexOf("return") > -1 ||
+          s.indexOf("refus") > -1
+        )
+          return "returned";
+        if (
+          s.indexOf("livraison") > -1 ||
+          s.indexOf("attente") > -1 ||
+          s.indexOf("report") > -1 ||
+          s.indexOf("cours") > -1 ||
+          s.indexOf("magasin") > -1 ||
+          s.indexOf("annul") > -1 ||
+          s.indexOf("abandon") > -1 ||
+          s.indexOf("cancel") > -1 ||
+          s.indexOf("pending") > -1
+        )
+          return "pending";
+        if (
+          s.indexOf("livr") > -1 ||
+          s.indexOf("deliver") > -1 ||
+          s.indexOf("payé") > -1 ||
+          s.indexOf("paye") > -1
+        )
+          return "delivered";
+        return "pending";
+      }
+      function canonName(n) {
+        var L = String(n || "").toLowerCase();
+        if (L.indexOf("moustix") > -1) return "Anti Moustix";
+        if (
+          L.indexOf("pack") > -1 &&
+          (L.indexOf("sac") > -1 ||
+            L.indexOf("voyage") > -1 ||
+            L.indexOf("4en1") > -1 ||
+            L.indexOf("4-en1") > -1 ||
+            L.indexOf("urban") > -1)
+        )
+          return "Packs sacs 4-en1";
+        if (
+          L.indexOf("sac de voyage") > -1 ||
+          L.indexOf("sac à dos") > -1 ||
+          L.indexOf("sac a dos") > -1 ||
+          L.indexOf("sac de sport") > -1 ||
+          L.indexOf("sacoche") > -1
+        )
+          return "Packs sacs 4-en1";
+        return n;
+      }
+      function cleanName(s) {
+        s = String(s || "").trim();
+        s = s.replace(/^\d+\s*[xX]\s*/, "");
+        s = s.replace(/\s*[xX]\s*\d+\s*$/, "");
+        s = s.replace(/\s*\([^()]*\)\s*$/, "").trim();
+        return canonName(s);
+      }
+      function lineQty(s) {
+        var m = String(s || "").match(/[xX]\s*(\d+)\s*$/);
+        return m ? parseInt(m[1], 10) : 1;
+      }
+      function splitProducts(prodStr) {
+        if (!prodStr) return [];
+        return prodStr
+          .split("|")
+          .map(function (p) {
+            return cleanName(p);
+          })
+          .filter(Boolean);
+      }
+      function costFromProducts(prodStr) {
+        if (!prodStr || !products.length) return 0;
+        var total = 0;
+        prodStr.split("|").forEach(function (line) {
+          var q = lineQty(line),
+            nm = cleanName(line).toLowerCase();
+          for (var i = 0; i < products.length; i++) {
+            var pn = (products[i].name || "").toLowerCase().trim();
+            if (pn && nm.indexOf(pn) > -1) {
+              total += num(products[i].buy) * q;
+              break;
+            }
+          }
+        });
+        return total;
+      }
+      function recalcCosts() {
+        var n = 0;
+        for (var i = 0; i < orders.length; i++) {
+          if (orders[i].product) {
+            orders[i].buy = costFromProducts(orders[i].product);
+            n++;
+          }
+        }
+        save("orders", orders);
+        render();
+        alert(
+          "Coûts recalculés sur " + n + " commande(s) à partir des produits."
+        );
+      }
+      function findCol(H, cands) {
+        for (var i = 0; i < H.length; i++) {
+          var h = (H[i] || "").toLowerCase().trim();
+          for (var j = 0; j < cands.length; j++)
+            if (h.indexOf(cands[j]) > -1) return i;
+        }
+        return -1;
+      }
+      function parseCSV(text) {
+        text = text.replace(/^\uFEFF/, "");
+        var rows = [],
+          row = [],
+          cur = "",
+          q = false;
+        for (var i = 0; i < text.length; i++) {
+          var ch = text[i];
+          if (q) {
+            if (ch == '"') {
+              if (text[i + 1] == '"') {
+                cur += '"';
+                i++;
+              } else q = false;
+            } else cur += ch;
+          } else {
+            if (ch == '"') q = true;
+            else if (ch == ",") {
+              row.push(cur);
+              cur = "";
+            } else if (ch == "\n") {
+              row.push(cur);
+              rows.push(row);
+              row = [];
+              cur = "";
+            } else if (ch == "\r") {
+            } else cur += ch;
+          }
+        }
+        if (cur !== "" || row.length) {
+          row.push(cur);
+          rows.push(row);
+        }
+        return rows;
+      }
+      function importCSV(ev) {
+        var file = ev.target.files[0];
+        if (!file) return;
+        var rdr = new FileReader();
+        rdr.onload = function () {
+          var rows = parseCSV(rdr.result);
+          if (rows.length < 2) {
+            alert("Fichier vide ou illisible.");
+            return;
+          }
+          var H = rows[0];
+          var ci = {
+            sell: findCol(H, [
+              "total price",
+              "total",
+              "montant",
+              "prix total",
+              "prix ttc",
+              "prix",
+            ]),
+            deliv: findCol(H, ["delivery price", "frais", "livraison"]),
+            status: findCol(H, ["status", "statut", "etat", "état"]),
+            date: findCol(H, ["delivered at", "created at", "date", "créé"]),
+            name: findCol(H, ["name", "nom", "client"]),
+            ref: findCol(H, [
+              "reference",
+              "référence",
+              "ref",
+              "order id",
+              "order",
+              "id",
+              "code barres",
+              "barres",
+              "tracking",
+              "suivi",
+            ]),
+            prod: findCol(H, ["product", "produit", "article", "item"]),
+            qty: findCol(H, ["quantity", "quantité", "qte", "qty"]),
+            city: findCol(H, [
+              "city",
+              "ville",
+              "gouvernorat",
+              "region",
+              "région",
+              "délégation",
+            ]),
+            phone: findCol(H, [
+              "téléphone",
+              "telephone",
+              "phone",
+              "gsm",
+              "tel",
+              "mobile",
+            ]),
+          };
+          if (ci.sell < 0) {
+            alert(
+              "Colonne du montant introuvable. Vérifie que le CSV a une colonne 'Total Price' ou 'Montant'."
+            );
+            return;
+          }
+          var idx = {};
+          orders.forEach(function (o) {
+            if (o.ref) idx[o.ref] = o;
+          });
+          var existNames = {};
+          products.forEach(function (p) {
+            existNames[(p.name || "").toLowerCase().trim()] = true;
+          });
+          var newProds = {};
+          var added = 0,
+            updated = 0;
+          for (var i = 1; i < rows.length; i++) {
+            var r = rows[i];
+            if (!r || (r.length === 1 && !r[0])) continue;
+            var qty = ci.qty > -1 ? num(r[ci.qty]) || 1 : 1;
+            var prodStr = ci.prod > -1 ? r[ci.prod] || "" : "";
+            var nm = ci.name > -1 ? (r[ci.name] || "").trim() : "";
+            var ref = ci.ref > -1 ? (r[ci.ref] || "").trim() : "";
+            if (!ref || /^[\d.]+e[\+\-]?\d+$/i.test(ref.replace(/\s/g, ""))) {
+              var ph = ci.phone > -1 ? (r[ci.phone] || "").trim() : "";
+              var rawD = ci.date > -1 ? (r[ci.date] || "").trim() : "";
+              var rawM = ci.sell > -1 ? (r[ci.sell] || "").trim() : "";
+              ref = (ph + "|" + rawD + "|" + rawM + "|" + (prodStr || ""))
+                .replace(/\s+/g, " ")
+                .slice(0, 120);
+            }
+            splitProducts(prodStr).forEach(function (pn) {
+              var key = pn.toLowerCase().trim();
+              if (pn && !existNames[key] && !newProds[key]) newProds[key] = pn;
+            });
+            var data = {
+              sell: ci.sell > -1 ? num(r[ci.sell]) : 0,
+              buy: costFromProducts(prodStr),
+              delivery: ci.deliv > -1 ? num(r[ci.deliv]) : 0,
+              status: mapStatus(ci.status > -1 ? r[ci.status] : ""),
+              date: parseDate(ci.date > -1 ? r[ci.date] : ""),
+              qty: qty,
+              city: ci.city > -1 ? (r[ci.city] || "").trim() : "",
+              note: nm || (prodStr ? prodStr.slice(0, 40) : "Commande " + ref),
+              product: prodStr,
+            };
+            if (ref && idx[ref]) {
+              var o = idx[ref];
+              o.sell = data.sell;
+              o.buy = data.buy;
+              o.delivery = data.delivery;
+              o.status = data.status;
+              o.date = data.date;
+              o.qty = data.qty;
+              o.city = data.city;
+              o.product = data.product;
+              if (nm) o.note = nm;
+              updated++;
+              continue;
+            }
+            var no = { id: uid(), ref: ref, returnFee: "" };
+            for (var key2 in data) no[key2] = data[key2];
+            orders.unshift(no);
+            if (ref) idx[ref] = no;
+            added++;
+          }
+          var addedProds = 0;
+          Object.keys(newProds).forEach(function (k) {
+            products.push({
+              id: uid(),
+              name: newProds[k],
+              sell: "",
+              buy: "",
+              delivery: "",
+            });
+            addedProds++;
+          });
+          save("orders", orders);
+          save("products", products);
+          render();
+          alert(
+            added +
+              " commande(s) importée(s)" +
+              (updated ? " · " + updated + " mise(s) à jour" : "") +
+              (addedProds ? " · " + addedProds + " produit(s) ajouté(s)" : "")
+          );
+        };
+        rdr.readAsText(file, "UTF-8");
+        ev.target.value = "";
+      }
+
+      /* ===================== ANALYSE ===================== */
+      function prodKey(o) {
+        var p = splitProducts(o.product || "");
+        return (p[0] || o.product || "Sans produit").trim() || "Sans produit";
+      }
+      function viewAnalyse() {
+        var delivered = orders.filter(function (o) {
+          return o.status === "delivered";
+        });
+        var returned = orders.filter(function (o) {
+          return o.status === "returned";
+        });
+        if (orders.length === 0) {
+          return '<div class="panel"><p class="empty">Pas encore de données. Importe ton CSV ou ajoute des commandes, puis reviens ici.</p></div>';
+        }
+
+        /* ---- par produit ---- */
+        var P = {};
+        delivered.forEach(function (o) {
+          var k = prodKey(o);
+          P[k] = P[k] || { name: k, rev: 0, profit: 0, n: 0, ret: 0 };
+          P[k].rev += num(o.sell);
+          P[k].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+          P[k].n++;
+        });
+        returned.forEach(function (o) {
+          var k = prodKey(o);
+          P[k] = P[k] || { name: k, rev: 0, profit: 0, n: 0, ret: 0 };
+          P[k].ret++;
+        });
+        var plist = Object.keys(P)
+          .map(function (k) {
+            return P[k];
+          })
+          .sort(function (a, b) {
+            return b.profit - a.profit;
+          });
+
+        var prodRows =
+          plist.length === 0
+            ? '<p class="empty">Aucune vente livrée pour le moment.</p>'
+            : plist
+                .map(function (p) {
+                  var tot = p.n + p.ret,
+                    tr = tot > 0 ? Math.round((p.ret / tot) * 100) : 0;
+                  var col =
+                    p.profit > 0
+                      ? "var(--green)"
+                      : p.profit < 0
+                      ? "var(--red)"
+                      : "var(--muted)";
+                  return (
+                    '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                    esc(p.name) +
+                    "</span>" +
+                    '<span class="badge" style="color:var(--teal);background:var(--teal)22">' +
+                    p.n +
+                    " vendus</span>" +
+                    (tr >= 30
+                      ? '<span class="badge" style="color:var(--red);background:var(--red)22">retours ' +
+                        tr +
+                        "%</span>"
+                      : "") +
+                    "</div>" +
+                    '<div class="li-sub">Chiffre: ' +
+                    fmt(p.rev) +
+                    "</div></div>" +
+                    '<div class="li-right"><span class="pl" style="color:' +
+                    col +
+                    '">' +
+                    fmt(p.profit) +
+                    "</span></div></div>"
+                  );
+                })
+                .join("");
+
+        /* ---- par ville ---- */
+        var V = {};
+        delivered.forEach(function (o) {
+          var c = (o.city || "").trim() || "Inconnue";
+          V[c] = V[c] || { name: c, rev: 0, profit: 0, n: 0 };
+          V[c].rev += num(o.sell);
+          V[c].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+          V[c].n++;
+        });
+        var vlist = Object.keys(V)
+          .map(function (k) {
+            return V[k];
+          })
+          .sort(function (a, b) {
+            return b.rev - a.rev;
+          });
+        var hasCity = vlist.some(function (v) {
+          return v.name !== "Inconnue";
+        });
+        var villeRows = !hasCity
+          ? '<p class="hint" style="margin:0">Pas de villes enregistrées. Réimporte ton CSV (la colonne "City" sera lue automatiquement) pour voir où vont tes ventes.</p>'
+          : vlist
+              .slice(0, 12)
+              .map(function (v) {
+                return (
+                  '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+                  esc(v.name) +
+                  "</span>" +
+                  '<span class="badge" style="color:var(--gold);background:var(--gold)22">' +
+                  v.n +
+                  " cmd</span></div>" +
+                  '<div class="li-sub">Profit: ' +
+                  fmt(v.profit) +
+                  "</div></div>" +
+                  '<div class="li-right"><span class="pl">' +
+                  fmt(v.rev) +
+                  "</span></div></div>"
+                );
+              })
+              .join("");
+
+        /* ---- conseils pub (ROAS) ---- */
+        var rev = delivered.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = delivered.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var delc = delivered.reduce(function (s, o) {
+          return s + num(o.delivery);
+        }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var grossMargin = rev - cogs - delc; // avant pub
+        var marginRatio = rev > 0 ? grossMargin / rev : 0;
+        var roas = ads > 0 ? rev / ads : 0;
+        var breakeven = marginRatio > 0 ? 1 / marginRatio : 0;
+        var adsTxt = "";
+        if (ads <= 0) {
+          adsTxt =
+            "Tu n'as pas encore enregistré de dépenses publicitaires. Ajoute-les dans l'onglet Dépenses pour calculer ton ROAS.";
+        } else if (marginRatio <= 0) {
+          adsTxt =
+            "⚠️ Ta marge avant pub est négative : tu perds de l'argent même sans compter la pub. Revois tes prix d'achat / de vente avant de dépenser en pub.";
+        } else {
+          var status =
+            roas >= breakeven * 1.3
+              ? "🟢 Très rentable"
+              : roas >= breakeven
+              ? "🟡 Rentable, juste"
+              : "🔴 En perte sur la pub";
+          adsTxt =
+            "Ton ROAS actuel est <b>" +
+            roas.toFixed(2) +
+            "x</b>. Ton seuil de rentabilité (break-even) est <b>" +
+            breakeven.toFixed(2) +
+            "x</b>. (" +
+            status +
+            ")<br>";
+          if (roas >= breakeven * 1.3)
+            adsTxt +=
+              "👉 Tu gagnes bien sur chaque dinar de pub. Tu peux <b>augmenter le budget</b> progressivement (+20% à la fois) en surveillant le ROAS.";
+          else if (roas >= breakeven)
+            adsTxt +=
+              "👉 Tu es rentable mais la marge est mince. <b>Optimise</b> (meilleures audiences/créatives) avant d'augmenter le budget.";
+          else
+            adsTxt +=
+              "👉 Tu perds de l'argent sur la pub. <b>Baisse le budget</b>, coupe les pubs faibles, ou augmente la marge (prix/coût) avant de continuer.";
+        }
+
+        /* ---- alertes ---- */
+        var alerts = [];
+        var noCost = products.filter(function (p) {
+          return !num(p.buy);
+        });
+        if (noCost.length)
+          alerts.push(
+            "🛒 " +
+              noCost.length +
+              " produit(s) sans prix d'achat — renseigne-les dans Produits puis clique « Recalculer les coûts » pour un profit exact."
+          );
+        plist.forEach(function (p) {
+          if (p.profit < 0)
+            alerts.push(
+              "📉 « " +
+                p.name +
+                " » te fait perdre de l'argent (" +
+                fmt(p.profit) +
+                "). Revois son prix ou son coût."
+            );
+        });
+        plist.forEach(function (p) {
+          var tot = p.n + p.ret;
+          if (tot >= 5 && p.ret / tot >= 0.3)
+            alerts.push(
+              "↩️ « " +
+                p.name +
+                " » a un taux de retour élevé (" +
+                Math.round((p.ret / tot) * 100) +
+                "%). Vérifie la qualité de confirmation/livraison."
+            );
+        });
+        var totDR = delivered.length + returned.length;
+        if (totDR >= 10) {
+          var dr = Math.round((delivered.length / totDR) * 100);
+          if (dr < 60)
+            alerts.push(
+              "🚚 Ton taux de livraison global est bas (" +
+                dr +
+                "%). Beaucoup de commandes ne sont pas livrées — améliore la confirmation par téléphone."
+            );
+        }
+        /* meilleur jour */
+        var D = {};
+        delivered.forEach(function (o) {
+          var d = o.date || "";
+          if (d) {
+            D[d] = D[d] || 0;
+            D[d] += num(o.sell) - num(o.buy) - num(o.delivery);
+          }
+        });
+        var bestDay = null,
+          bestV = -1e9;
+        Object.keys(D).forEach(function (d) {
+          if (D[d] > bestV) {
+            bestV = D[d];
+            bestDay = d;
+          }
+        });
+        var alertsTxt = alerts.length
+          ? alerts
+              .map(function (a) {
+                return (
+                  '<div class="li"><div class="li-main"><div class="li-sub" style="color:var(--cream);font-size:13px">' +
+                  a +
+                  "</div></div></div>"
+                );
+              })
+              .join("")
+          : '<p class="empty">Aucune alerte. Tout est sain 👍</p>';
+
+        return (
+          "" +
+          '<div class="panel"><h3>🤖 Analyse IA</h3><p class="hint" style="margin:-6px 0 10px">L\'IA lit tes chiffres et te donne des recommandations concrètes.</p>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:10px">' +
+          '<button class="primary" onclick="runAI()">✨ Lancer l\'analyse IA</button>' +
+          '<button class="primary" onclick="runAIProducts()" style="background:linear-gradient(135deg,var(--teal),#3aa593)">💡 Idées de nouveaux produits</button>' +
+          '<button class="primary" onclick="runAIForecast()" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">📅 Perspectives mois prochain</button>' +
+          "</div>" +
+          '<div id="ai_out" class="ai-out"></div></div>' +
+          '<div class="panel"><h3>🏆 Produits les plus rentables</h3><p class="hint" style="margin:-6px 0 10px">Classés du plus rentable au moins rentable.</p><div class="list" style="padding:0">' +
+          prodRows +
+          "</div></div>" +
+          '<div class="panel"><h3>📍 Ventes par ville</h3><div class="list" style="padding:0">' +
+          villeRows +
+          "</div></div>" +
+          '<div class="panel"><h3>📣 Conseils publicité</h3><p class="hint" style="margin:0;color:var(--cream);line-height:1.7">' +
+          adsTxt +
+          "</p></div>" +
+          (bestDay
+            ? '<div class="panel"><h3>📅 Meilleur jour</h3><p class="hint" style="margin:0;color:var(--cream)">Ton meilleur jour de profit : <b>' +
+              bestDay +
+              "</b> (" +
+              fmt(bestV) +
+              ").</p></div>"
+            : "") +
+          '<div class="panel"><h3>🔔 Alertes & recommandations</h3><div class="list" style="padding:0">' +
+          alertsTxt +
+          "</div></div>"
+        );
+      }
+
+      function aiSummary() {
+        var d = orders.filter(function (o) {
+          return o.status === "delivered";
+        });
+        var r = orders.filter(function (o) {
+          return o.status === "returned";
+        });
+        var p = orders.filter(function (o) {
+          return o.status === "pending";
+        });
+        var rev = d.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = d.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var delc = d.reduce(function (s, o) {
+          return s + num(o.delivery);
+        }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var achat = expenses
+          .filter(function (e) {
+            return e.type === "achat";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var emb = expenses
+          .filter(function (e) {
+            return e.type === "emballage";
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var other = expenses
+          .filter(function (e) {
+            return (
+              e.type !== "ads" && e.type !== "achat" && e.type !== "emballage"
+            );
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var profit = rev - cogs - delc - ads - achat - emb - other;
+        var roas = ads > 0 ? (rev / ads).toFixed(2) : "0";
+        var marge = rev > 0 ? ((profit / rev) * 100).toFixed(1) : "0";
+        /* produits */
+        var PR = {};
+        d.forEach(function (o) {
+          var k = prodKey(o);
+          PR[k] = PR[k] || { n: 0, profit: 0, ret: 0 };
+          PR[k].n++;
+          PR[k].profit += num(o.sell) - num(o.buy) - num(o.delivery);
+        });
+        r.forEach(function (o) {
+          var k = prodKey(o);
+          PR[k] = PR[k] || { n: 0, profit: 0, ret: 0 };
+          PR[k].ret++;
+        });
+        var prods = Object.keys(PR)
+          .map(function (k) {
+            return {
+              name: k,
+              n: PR[k].n,
+              profit: Math.round(PR[k].profit),
+              ret: PR[k].ret,
+            };
+          })
+          .sort(function (a, b) {
+            return b.profit - a.profit;
+          })
+          .slice(0, 10);
+        /* villes */
+        var CI = {};
+        d.forEach(function (o) {
+          var c = (o.city || "").trim() || "Inconnue";
+          CI[c] = CI[c] || { n: 0, rev: 0 };
+          CI[c].n++;
+          CI[c].rev += num(o.sell);
+        });
+        var cities = Object.keys(CI)
+          .map(function (c) {
+            return { name: c, n: CI[c].n, rev: Math.round(CI[c].rev) };
+          })
+          .sort(function (a, b) {
+            return b.rev - a.rev;
+          })
+          .slice(0, 8);
+        /* comparaison mois */
+        var M = monthData();
+        var cur = M[0];
+        var prev = M[1];
+        var monthComp = "";
+        if (cur && prev) {
+          monthComp =
+            "Mois en cours (" +
+            monthLabel(cur.key) +
+            "): profit=" +
+            Math.round(cur.profit) +
+            " DT, CA=" +
+            Math.round(cur.rev) +
+            " DT, livrées=" +
+            cur.n +
+            ". Mois précédent (" +
+            monthLabel(prev.key) +
+            "): profit=" +
+            Math.round(prev.profit) +
+            " DT, CA=" +
+            Math.round(prev.rev) +
+            " DT, livrées=" +
+            prev.n +
+            ".";
+        }
+        /* objectif */
+        var goal = getGoal();
+        var now = new Date();
+        var curKey = now.getFullYear() + "-" + pad(now.getMonth() + 1);
+        var curM = M.filter(function (m) {
+          return m.key === curKey;
+        })[0];
+        var curP = curM ? curM.profit : 0;
+        var goalLine =
+          goal > 0
+            ? "Objectif mensuel fixé: " +
+              Math.round(goal) +
+              " DT. Profit actuel ce mois: " +
+              Math.round(curP) +
+              " DT (" +
+              (goal > 0 ? Math.round((curP / goal) * 100) : 0) +
+              "% atteint)."
+            : "Aucun objectif mensuel défini.";
+        /* résumé */
+        var s =
+          "Devise: Dinar Tunisien (DT). Modèle: COD (paiement à la livraison) en Tunisie.\n";
+        s +=
+          "Commandes: livrées=" +
+          d.length +
+          ", retours=" +
+          r.length +
+          ", en attente=" +
+          p.length +
+          ". Taux livraison=" +
+          (d.length + r.length > 0
+            ? Math.round((d.length / (d.length + r.length)) * 100)
+            : 0) +
+          "%.\n";
+        s += "Recettes=" + Math.round(rev) + " DT. Marge=" + marge + "%.\n";
+        s +=
+          "Dépenses détaillées: Publicité=" +
+          Math.round(ads) +
+          " DT | Achat produits=" +
+          Math.round(achat) +
+          " DT | Emballage/Logistique=" +
+          Math.round(emb) +
+          " DT | Autres=" +
+          Math.round(other) +
+          " DT | Livraison=" +
+          Math.round(delc) +
+          " DT.\n";
+        s += "Profit net=" + Math.round(profit) + " DT. ROAS=" + roas + "x.\n";
+        if (monthComp) s += monthComp + "\n";
+        s += goalLine + "\n";
+        s +=
+          "Produits (nom | vendus | profit DT | retours): " +
+          prods
+            .map(function (x) {
+              return x.name + " | " + x.n + " | " + x.profit + " | " + x.ret;
+            })
+            .join(" ;; ") +
+          "\n";
+        s +=
+          "Villes (nom | commandes | CA DT): " +
+          (cities.length
+            ? cities
+                .map(function (x) {
+                  return x.name + " | " + x.n + " | " + x.rev;
+                })
+                .join(" ;; ")
+            : "non renseignées") +
+          "\n";
+        return s;
+      }
+      function runAIForecast() {
+        var out = document.getElementById("ai_out");
+        if (!AI_PROXY || AI_PROXY.indexOf("workers.dev") < 0) {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">⚠️ Lien du Worker IA manquant (AI_PROXY).</p>';
+          return;
+        }
+        if (orders.length === 0) {
+          out.innerHTML =
+            '<p class="hint">Pas encore de données à analyser.</p>';
+          return;
+        }
+        /* calcul tendance sur les 2 derniers mois */
+        var M = monthData();
+        var trendTxt = "";
+        if (M.length >= 2) {
+          var cur = M[0],
+            prev = M[1];
+          var growthRate =
+            prev.profit !== 0
+              ? (
+                  ((cur.profit - prev.profit) / Math.abs(prev.profit)) *
+                  100
+                ).toFixed(0)
+              : 0;
+          trendTxt =
+            "Tendance: mois en cours=" +
+            Math.round(cur.profit) +
+            " DT, mois précédent=" +
+            Math.round(prev.profit) +
+            " DT, évolution=" +
+            growthRate +
+            "%.\n";
+          trendTxt +=
+            "Meilleur mois historique: " +
+            Math.round(
+              Math.max.apply(
+                null,
+                M.map(function (m) {
+                  return m.profit;
+                })
+              )
+            ) +
+            " DT.\n";
+        }
+        var now = new Date();
+        var nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        var MOIS = [
+          "Janvier",
+          "Février",
+          "Mars",
+          "Avril",
+          "Mai",
+          "Juin",
+          "Juillet",
+          "Août",
+          "Septembre",
+          "Octobre",
+          "Novembre",
+          "Décembre",
+        ];
+        var nextMonthName =
+          MOIS[nextMonth.getMonth()] + " " + nextMonth.getFullYear();
+        var goal = getGoal();
+        var prompt =
+          "Tu es un analyste expert en e-commerce COD (paiement à la livraison) en Tunisie. " +
+          "En te basant sur les données historiques ci-dessous, fais une PROJECTION pour le mois de " +
+          nextMonthName +
+          ". " +
+          "Donne:\n" +
+          "1) 📊 Projection réaliste: CA et profit estimés si la tendance continue (calcule le chiffre précis en DT).\n" +
+          "2) 🚀 Scénario optimiste: que faut-il faire concrètement pour dépasser les résultats actuels (+20% minimum) ?\n" +
+          "3) 🎯 Objectif mensuel: " +
+          (goal > 0
+            ? "Le client vise " +
+              Math.round(goal) +
+              " DT de profit. Est-ce réaliste ? Que faire exactement pour y arriver ?"
+            : "Propose un objectif de profit réaliste pour le mois prochain.") +
+          "\n" +
+          "4) 📦 Produits: lesquels mettre en avant le mois prochain et pourquoi (selon les performances actuelles).\n" +
+          "5) 📣 Budget pub conseillé pour le mois prochain (en DT), basé sur le ROAS actuel et la marge.\n" +
+          "6) ⚡ 3 actions prioritaires à faire AVANT le début du mois prochain.\n" +
+          "Sois très précis avec les chiffres. Parle en DT tunisien. Réponds en français simple.\n\nDONNÉES:\n" +
+          aiSummary() +
+          trendTxt;
+        askAI(prompt, out);
+      }
+      function runAI() {
+        var out = document.getElementById("ai_out");
+        if (!AI_PROXY || AI_PROXY.indexOf("workers.dev") < 0) {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">⚠️ Lien du Worker IA manquant (AI_PROXY).</p>';
+          return;
+        }
+        if (orders.length === 0) {
+          out.innerHTML =
+            '<p class="hint">Pas encore de données à analyser.</p>';
+          return;
+        }
+        var prompt =
+          "Tu es un conseiller expert en e-commerce COD (paiement à la livraison) en Tunisie. " +
+          "Analyse les données ci-dessous et donne des recommandations CONCRÈTES et actionnables en français simple, organisées en sections:\n" +
+          "1) 🏆 Produits: lesquels pousser, lesquels arrêter (avec raison chiffrée).\n" +
+          "2) 📣 Publicité: conseil budget selon le ROAS et les dépenses actuelles.\n" +
+          "3) 📍 Villes: lesquelles cibler en priorité.\n" +
+          "4) 🎯 Objectif mensuel: est-ce qu'il va être atteint ? Que faire pour y arriver ?\n" +
+          "5) ⚠️ Alertes: retours élevés, marges faibles, dépenses excessives.\n" +
+          "6) 💡 3 actions concrètes à faire CETTE SEMAINE.\n" +
+          "Base-toi uniquement sur les chiffres fournis. Sois direct et précis.\n\nDONNÉES:\n" +
+          aiSummary();
+        askAI(prompt, out);
+      }
+      function runAIProducts() {
+        var out = document.getElementById("ai_out");
+        if (!AI_PROXY || AI_PROXY.indexOf("workers.dev") < 0) {
+          out.innerHTML =
+            '<p class="hint" style="color:var(--red)">⚠️ Lien du Worker IA manquant (AI_PROXY).</p>';
+          return;
+        }
+        var prompt =
+          "Tu es un expert en produits gagnants pour l'e-commerce COD (paiement à la livraison) en Tunisie. " +
+          "En te basant sur les produits actuels de la boutique et leurs performances ci-dessous, propose 6 à 8 NOUVEAUX produits à tester. " +
+          "Pour chaque produit donne: le nom, pourquoi il peut marcher (tendance/besoin), prix d'achat estimé et prix de vente conseillé en DT, le public cible, et un angle pub simple. " +
+          "Privilégie des produits adaptés au marché tunisien et complémentaires à ce qui marche déjà. Réponds en français simple, en liste claire. " +
+          "IMPORTANT: ce sont des idées basées sur des connaissances générales (pas des données de marché en temps réel) — à tester avant d'investir.\n\nPRODUITS ACTUELS ET PERFORMANCES:\n" +
+          aiSummary();
+        askAI(prompt, out);
+      }
+      function askAI(prompt, out) {
+        out.innerHTML =
+          '<p class="hint">🤖 L\'IA réfléchit… (quelques secondes)</p>';
+        fetch(AI_PROXY, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: prompt }],
+          }),
+        })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            var txt = (((data.choices || [])[0] || {}).message || {}).content;
+            if (txt) {
+              out.innerHTML =
+                '<div class="ai-text">' +
+                esc(txt)
+                  .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+                  .replace(/^\s*[\*\-]\s/gm, "• ")
+                  .replace(/\n/g, "<br>") +
+                "</div>";
+              return;
+            }
+            var em = data.error
+              ? data.error.message || JSON.stringify(data.error)
+              : "réponse vide";
+            out.innerHTML =
+              '<p class="hint" style="color:var(--red)">L\'IA n\'a pas répondu. ' +
+              esc(em) +
+              "<br>Réessaie dans un instant.</p>";
+          })
+          .catch(function (e) {
+            out.innerHTML =
+              '<p class="hint" style="color:var(--red)">Erreur de connexion à l\'IA. Vérifie le lien du Worker.<br>' +
+              esc(e.message) +
+              "</p>";
+          });
+      }
+
+      /* ===================== RAPPORTS ===================== */
+      var MONTHS_FR = [
+        "janv.",
+        "févr.",
+        "mars",
+        "avr.",
+        "mai",
+        "juin",
+        "juil.",
+        "août",
+        "sept.",
+        "oct.",
+        "nov.",
+        "déc.",
+      ];
+      function monthLabel(k) {
+        var p = k.split("-");
+        if (p.length < 2) return k;
+        var mi = parseInt(p[1], 10) - 1;
+        return (MONTHS_FR[mi] || p[1]) + " " + p[0];
+      }
+      function monthData() {
+        var m = {};
+        function get(k) {
+          m[k] = m[k] || {
+            key: k,
+            rev: 0,
+            cogs: 0,
+            deliv: 0,
+            exp: 0,
+            n: 0,
+            ret: 0,
+          };
+          return m[k];
+        }
+        orders.forEach(function (o) {
+          var k = (o.date || "").slice(0, 7);
+          if (!k) return;
+          if (o.status === "delivered") {
+            var x = get(k);
+            x.rev += num(o.sell);
+            x.cogs += num(o.buy);
+            x.deliv += num(o.delivery);
+            x.n++;
+          } else if (o.status === "returned") {
+            var y = get(k);
+            y.deliv += num(o.returnFee);
+            y.ret++;
+          }
+        });
+        expenses.forEach(function (e) {
+          var k = (e.date || "").slice(0, 7);
+          if (!k) return;
+          get(k).exp += num(e.amount);
+        });
+        return Object.keys(m)
+          .map(function (k) {
+            var x = m[k];
+            x.profit = x.rev - x.cogs - x.deliv - x.exp;
+            return x;
+          })
+          .sort(function (a, b) {
+            return b.key.localeCompare(a.key);
+          });
+      }
+      function viewRapports() {
+        var M = monthData();
+        if (M.length === 0)
+          return '<div class="panel"><p class="empty">Pas encore de données. Ajoute des commandes pour voir les rapports mensuels.</p></div>';
+        /* comparaison ce mois vs mois précédent */
+        var cur = M[0],
+          prev = M[1];
+        var cmp = "";
+        if (prev) {
+          var diff = cur.profit - prev.profit;
+          var pct =
+            prev.profit !== 0
+              ? Math.round((diff / Math.abs(prev.profit)) * 100)
+              : 0;
+          var col = diff >= 0 ? "var(--green)" : "var(--red)";
+          cmp =
+            '<div class="panel"><h3>📊 ' +
+            monthLabel(cur.key) +
+            " vs " +
+            monthLabel(prev.key) +
+            "</h3>" +
+            '<p class="hint" style="margin:0;color:var(--cream);line-height:1.8">Profit ce mois: <b style="color:' +
+            col +
+            '">' +
+            fmt(cur.profit) +
+            "</b> (" +
+            (diff >= 0 ? "+" : "") +
+            fmt(diff) +
+            ", " +
+            (pct >= 0 ? "+" : "") +
+            pct +
+            "%) vs " +
+            fmt(prev.profit) +
+            " le mois dernier.<br>" +
+            "Commandes livrées: " +
+            cur.n +
+            " vs " +
+            prev.n +
+            ".</p></div>";
+        }
+        /* graphe profit par mois (12 derniers) */
+        var chartM = M.slice(0, 12).slice().reverse();
+        var maxP = Math.max(
+          1,
+          Math.max.apply(
+            null,
+            chartM.map(function (x) {
+              return Math.abs(x.profit);
+            })
+          )
+        );
+        var chart =
+          '<div class="chart-wrap">' +
+          chartM
+            .map(function (x) {
+              var h = (Math.abs(x.profit) / maxP) * 100,
+                col = x.profit >= 0 ? "var(--green)" : "var(--red)";
+              return (
+                '<div class="bar-group"><div class="bars"><div class="bar" style="height:' +
+                h +
+                "%;background:" +
+                col +
+                '" title="' +
+                fmt(x.profit) +
+                '"></div></div><div class="bar-lbl">' +
+                x.key.slice(2) +
+                "</div></div>"
+              );
+            })
+            .join("") +
+          "</div>";
+        /* tableau mensuel */
+        var rows = M.map(function (x) {
+          var col = x.profit >= 0 ? "var(--green)" : "var(--red)";
+          return (
+            '<div class="li"><div class="li-main"><div class="li-top"><span class="li-title">' +
+            monthLabel(x.key) +
+            "</span>" +
+            '<span class="badge" style="color:var(--teal);background:var(--teal)22">' +
+            x.n +
+            " livrées</span></div>" +
+            '<div class="li-sub">CA ' +
+            fmt(x.rev) +
+            " · Achat " +
+            fmt(x.cogs) +
+            " · Livr. " +
+            fmt(x.deliv) +
+            " · Pub/autres " +
+            fmt(x.exp) +
+            "</div></div>" +
+            '<div class="li-right"><span class="pl" style="color:' +
+            col +
+            '">' +
+            fmt(x.profit) +
+            "</span></div></div>"
+          );
+        }).join("");
+        return (
+          "" +
+          '<div class="panel noprint"><button class="primary" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button></div>' +
+          cmp +
+          '<div class="panel"><h3>📈 Profit par mois</h3>' +
+          chart +
+          "</div>" +
+          '<div class="panel"><h3>🗓️ Détail mensuel</h3><div class="list" style="padding:0">' +
+          rows +
+          "</div></div>"
+        );
+      }
+
+      /* ===================== MARGE MARKETING ===================== */
+      function margeKpis() {
+        var d = orders.filter(function (o) {
+          return o.status === "delivered" && inPeriod(o.date);
+        });
+        var r = orders.filter(function (o) {
+          return o.status === "returned" && inPeriod(o.date);
+        });
+        var revenue = d.reduce(function (s, o) {
+          return s + num(o.sell);
+        }, 0);
+        var cogs = d.reduce(function (s, o) {
+          return s + num(o.buy);
+        }, 0);
+        var deliv =
+          d.reduce(function (s, o) {
+            return s + num(o.delivery);
+          }, 0) +
+          r.reduce(function (s, o) {
+            return s + num(o.returnFee);
+          }, 0);
+        var ads = expenses
+          .filter(function (e) {
+            return e.type === "ads" && inPeriod(e.date);
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var emballage = expenses
+          .filter(function (e) {
+            return e.type === "emballage" && inPeriod(e.date);
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var other = expenses
+          .filter(function (e) {
+            return (
+              e.type !== "ads" &&
+              e.type !== "achat" &&
+              e.type !== "emballage" &&
+              inPeriod(e.date)
+            );
+          })
+          .reduce(function (s, e) {
+            return s + num(e.amount);
+          }, 0);
+        var out = ads + emballage + other + deliv + cogs;
+        var marge = revenue - out;
+        return {
+          revenue: revenue,
+          ads: ads,
+          emballage: emballage,
+          other: other,
+          deliv: deliv,
+          cogs: cogs,
+          out: out,
+          marge: marge,
+          margePct: revenue > 0 ? (marge / revenue) * 100 : 0,
+          roas: ads > 0 ? revenue / ads : 0,
+        };
+      }
+      function viewMargeMarketing() {
+        var k = margeKpis();
+        var mc = k.marge >= 0 ? "var(--green)" : "var(--red)";
+        var fbar =
+          '<div class="fbar">' +
+          [
+            ["all", "Tout"],
+            ["month", "Ce mois"],
+            ["30", "30 jours"],
+            ["7", "7 jours"],
+          ]
+            .map(function (x) {
+              return (
+                '<button class="fpill ' +
+                (period === x[0] ? "on" : "") +
+                '" onclick="setPeriod(\'' +
+                x[0] +
+                "')\">" +
+                x[1] +
+                "</button>"
+              );
+            })
+            .join("") +
+          "</div>";
+        var hero =
+          '<div class="panel" style="text-align:center;padding:28px 20px">' +
+          '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Marge marketing ' +
+          periodLabel() +
+          "</div>" +
+          '<div style="font-size:48px;font-weight:800;color:' +
+          mc +
+          ';line-height:1.1">' +
+          fmt(k.marge) +
+          "</div>" +
+          '<div style="font-size:13px;color:var(--muted);margin-top:8px">' +
+          k.margePct.toFixed(1) +
+          "% des recettes · pub, emballage, autres dépenses, livraison et achat produits inclus</div>" +
+          "</div>";
+        var calc =
+          '<div class="panel"><h3>🧮 Détail du calcul</h3>' +
+          '<p class="hint" style="margin:-4px 0 12px">Le coût d\'achat des produits est repris depuis l\'onglet Produits (selon le prix d\'achat renseigné par produit).</p>' +
+          '<div class="calc-rows">' +
+          calcRow(
+            "💰",
+            "Recettes (commandes livrées)",
+            fmt(k.revenue),
+            "var(--green)",
+            false
+          ) +
+          calcRow("📦", "− Achat produits", fmt(k.cogs), "var(--red)", true) +
+          calcRow("📣", "− Publicité (Ads)", fmt(k.ads), "var(--red)", true) +
+          calcRow(
+            "📫",
+            "− Emballage / Logistique",
+            fmt(k.emballage),
+            "var(--red)",
+            true
+          ) +
+          calcRow("👛", "− Autres dépenses", fmt(k.other), "var(--red)", true) +
+          calcRow(
+            "🚚",
+            "− Frais de livraison",
+            fmt(k.deliv),
+            "var(--red)",
+            true
+          ) +
+          '<div class="calc-sep"></div>' +
+          '<div class="calc-total"><span>= Marge marketing</span><span style="color:' +
+          mc +
+          ';font-size:22px;font-weight:800">' +
+          fmt(k.marge) +
+          "</span></div>" +
+          "</div>" +
+          (k.roas > 0
+            ? '<div style="margin-top:14px;padding:10px 14px;background:var(--gold)18;border-radius:10px;font-size:13px;color:var(--gold)">📊 ROAS : chaque 1 DT dépensé en pub a généré <b>' +
+              k.roas.toFixed(2) +
+              " DT</b> de recettes</div>"
+            : "") +
+          "</div>";
+        return fbar + hero + calc;
+      }
+      function calcRow(ic, lbl, val, col, minus) {
+        return (
+          '<div class="calc-row"><span class="calc-ic">' +
+          ic +
+          '</span><span class="calc-lbl">' +
+          lbl +
+          '</span><span class="calc-val" style="color:' +
+          col +
+          '">' +
+          (minus && val !== "0 DT" ? "−" : "") +
+          val +
+          "</span></div>"
+        );
+      }
+      /* ============================================================== */
+
+      function f(label, inner) {
+        return (
+          '<label class="field"><span>' + label + "</span>" + inner + "</label>"
+        );
+      }
+
+      /* ---------- actions ---------- */
+      function resetAll() {
+        if (!confirm("Tout supprimer ? Action irréversible.")) return;
+        orders = [];
+        expenses = [];
+        products = [];
+        save("orders", []);
+        save("expenses", []);
+        save("products", []);
+        render();
+      }
+      function exportCSV() {
+        var rows = [
+          [
+            "Type",
+            "Date",
+            "Description",
+            "Prix vente",
+            "Prix achat",
+            "Livraison",
+            "Statut",
+            "Montant",
+          ],
+        ];
+        orders.forEach(function (o) {
+          rows.push([
+            "Commande",
+            o.date,
+            o.note || o.product || "",
+            o.sell,
+            o.buy,
+            o.delivery,
+            (STATUS[o.status] || {}).label || "",
+            "",
+          ]);
+        });
+        expenses.forEach(function (e) {
+          rows.push([
+            "Dépense",
+            e.date,
+            e.desc || "",
+            "",
+            "",
+            "",
+            e.type === "ads" ? "Publicité" : "Autre",
+            e.amount,
+          ]);
+        });
+        var csv =
+          "\uFEFF" +
+          rows
+            .map(function (r) {
+              return r
+                .map(function (c) {
+                  return '"' + (c == null ? "" : c) + '"';
+                })
+                .join(";");
+            })
+            .join("\n");
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        a.download = "dawema-comptable.csv";
+        a.click();
+      }
+
+      /* ====== LOGIN (Firebase Auth) ====== */
+      var isViewer = false;
+      function showApp() {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("appwrap").style.display = "block";
+        render();
+      }
+      function showLogin() {
+        document.getElementById("appwrap").style.display = "none";
+        document.getElementById("login").style.display = "flex";
+      }
+      function doLogin() {
+        var email = document.getElementById("l_user").value.trim(),
+          pass = document.getElementById("l_pass").value;
+        if (!email || !pass) {
+          document.getElementById("l_err").textContent =
+            "Remplis l'email et le mot de passe.";
+          return;
+        }
+        document.getElementById("l_err").textContent = "Connexion…";
+        fbAuth
+          .signInWithEmailAndPassword(email, pass)
+          .then(function () {
+            document.getElementById("l_err").textContent = "";
+            document.getElementById("l_pass").value = "";
+          })
+          .catch(function (e) {
+            document.getElementById("l_err").textContent =
+              "Email ou mot de passe incorrect.";
+          });
+      }
+      function logout() {
+        fbAuth.signOut();
+      }
+      var _subscribed = false;
+      fbAuth.onAuthStateChanged(function (user) {
+        if (user) {
+          isViewer = (user.email || "").toLowerCase() === "viewer@dawema.com";
+          if (!_subscribed) {
+            _subscribed = true;
+            subscribeData();
+          }
+          showApp();
+        } else {
+          showLogin();
+        }
+      });
+    </script>
+  </body>
+</html>
